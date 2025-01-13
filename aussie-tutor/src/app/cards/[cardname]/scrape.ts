@@ -13,6 +13,7 @@ async function scrapeMtgMate(card: string): Promise<any[]> {
     const $ = cheerio.load(data);
     const reactProps = $('div[data-react-class="FilterableTable"]').attr('data-react-props');
     const parsedData = JSON.parse(reactProps).uuid;
+    console.log(parsedData)
     let cleanData = [];
 
     for (const key in parsedData) {

@@ -1,12 +1,44 @@
 "use client";
 
 import scrape from "./scrape"
+import getCardFace from "./getCardFace";
 import { useParams, useRouter } from 'next/navigation'
-import { useEffect, useState } from "react";
+import { JSX, useEffect, useState } from "react";
+import {InfoPanelProps, CardDetails} from '../../../interfaces'
+
+function InfoPanel({ card }: InfoPanelProps): JSX.Element {
+  const description = card.details ? `${card.set} (${card.details})` : card.set
+  const [face, setFace] = useState<string>("")
+  
+  useEffect(() => {
+    // Define the async function inside the effect
+    const fetchCardFace = async () => {
+      try {
+        const faceUrl = await getCardFace(card);
+        setFace(faceUrl);
+      } catch (error) {
+        console.error("Error fetching card face:", error);
+      }
+    };
+    fetchCardFace();
+  }, [card]);
+
+  return (
+    <div className="flex">
+      <img src={face || undefined} width={146} height={204}></img>
+      <div>
+        {/* change this to store's logo */}
+        {/* <h1>{card.store}</h1> */}
+        <p>{description}</p>
+        <h2>Price: {card.price}</h2>
+      </div>
+    </div>
+  )
+} 
 
 export default function Card() {
   const { cardname } = useParams<{ cardname: string | string[] | undefined }>();
-  const [data, setData] = useState<any[]>([]);
+  const [data, setData] = useState<CardDetails[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -22,13 +54,10 @@ export default function Card() {
   }, [cardname]);
 
   return (
-    <div>
+    <div className="">
       <h1>{cardname}</h1>
-      {data.map((card, index) => (
-        <div key={index}>
-          <p>{card.store}</p>
-          <p>{card.price}</p>
-        </div>
+      {data.map((card: CardDetails, index) => (
+        <InfoPanel key={index} card={card} />
       ))}
     </div>
   );
