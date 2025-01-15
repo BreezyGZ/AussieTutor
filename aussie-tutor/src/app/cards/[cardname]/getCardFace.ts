@@ -1,4 +1,4 @@
-import { CardDetails } from "@/interfaces";
+import { CardDetails } from "@/app/interfaces";
 
 const axios = require('axios');
 const fuzzysort = require('fuzzysort');
@@ -12,13 +12,11 @@ interface MTGSet {
 async function fetchSetNameToCodeMap(): Promise<Record<string, string>> {
   const cacheKey = "mtgSetNameToCodeMap";
 
-  // Check if cache exists in localStorage
   const cachedData = localStorage.getItem(cacheKey);
   if (cachedData) {
     return JSON.parse(cachedData); // Return cached data if available
   }
 
-  // If not in cache, fetch data from Scryfall API
   const url = "https://api.scryfall.com/sets";
   try {
     console.log("Fetching from API...");
@@ -69,9 +67,16 @@ async function getSetCode(setName: string, threshold: number = 80): Promise<stri
 
 export default async function getCardFace(card: CardDetails) {
   const setCode = await getSetCode(card.set)
-  const { data } = await axios.get(`https://api.scryfall.com/cards/search?q=${card.cardname}+set%3A${setCode}`);
-  // Just going to use the first return for now (sloppy)
-  // needs to check for card variants in card.details
+  let extraSearchParams = ""
+  if (card.details) {
+    if (card.details.includes("Retro") || card.details.includes("retro")) {
+      extraSearchParams += "+is%3Aold"
+    }
+    if (card.details.includes("Borderless") || card.details.includes("borderless")) {
+      extraSearchParams += "+is%3Aborderless"
+    }
+  }
+  const { data } = await axios.get(`https://api.scryfall.com/cards/search?q=${card.cardname}+set%3A${setCode}${extraSearchParams}`);
   const face = data.data[0].image_uris.border_crop;
   return face
 }

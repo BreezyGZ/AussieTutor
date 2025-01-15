@@ -3,6 +3,8 @@ const axios = require('axios');
 
 import { useEffect, useState } from "react";
 import { useRouter } from 'next/navigation';
+import './globals.css'
+import './landing.css'
 
 async function getPartialMatches(partial: string) {
   const {data} = await axios.get("https://api.scryfall.com/catalog/card-names")
@@ -23,7 +25,7 @@ async function getPartialMatches(partial: string) {
 
     return a.localeCompare(b);
   });
-  return sortedCards;
+  return sortedCards.map((str: string) => str.length > 31 ? str.slice(0, 28) + '...' : str);;
 }
 
 export default function Home() {
@@ -49,26 +51,24 @@ export default function Home() {
   }, [search]);
 
   return (
-    <div>
-      <div>
-        <label>
-          Card
-        </label>
-        <input
-          type="text"
-          placeholder="Search for a card"
-          onChange={(e)=>setSearch(e.target.value)}
-        >
-        </input>
-          
-      </div>
-      <div className="matchlist">
-        {matches.slice(0, 10).map((item, index) => (
-          <div key={index} className="match" onClick={() => {router.push(`/cards/${item}`)}}>
-            {item}
-          </div>
-        ))}
-
+    <div className="main">
+      <div className="main-wrapper">
+        <h1>AussieTutor</h1>
+        <div className="search-bar">
+          <input
+            type="text"
+            placeholder="Find"
+            onChange={(e)=>setSearch(e.target.value)}
+          >
+          </input>
+          <div className="matchlist">
+            {matches.slice(0, 10).map((item, index) => (
+              <div key={index} className="match" onClick={() => {router.push(`/cards/${item}`)}}>
+                {item}
+              </div>
+            ))}
+          </div>  
+        </div>
       </div>
     </div>
   )

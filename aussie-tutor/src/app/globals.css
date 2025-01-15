@@ -19,3 +19,9 @@ body {
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+h1 {
+  font-size: 32pt;
+  font-weight: 700;
+}
+

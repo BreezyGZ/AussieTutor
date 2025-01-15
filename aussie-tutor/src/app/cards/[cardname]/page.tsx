@@ -4,7 +4,8 @@ import scrape from "./scrape"
 import getCardFace from "./getCardFace";
 import { useParams, useRouter } from 'next/navigation'
 import { JSX, useEffect, useState } from "react";
-import {InfoPanelProps, CardDetails} from '../../../interfaces'
+import {InfoPanelProps, CardDetails} from '../../interfaces'
+import '../../globals.css';
 
 function InfoPanel({ card }: InfoPanelProps): JSX.Element {
   const description = card.details ? `${card.set} (${card.details})` : card.set
@@ -54,11 +55,13 @@ export default function Card() {
   }, [cardname]);
 
   return (
-    <div className="">
-      <h1>{cardname}</h1>
-      {data.map((card: CardDetails, index) => (
-        <InfoPanel key={index} card={card} />
-      ))}
+    <div className="flex justify-between">
+      <div className="flex flex-col">
+        <h1 className="text-blue-500">{cardname}</h1>
+        {data.map((card: CardDetails, index) => (
+          <InfoPanel key={index} card={card} />
+        ))}
+      </div>
     </div>
   );
 }
