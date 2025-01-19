@@ -82,78 +82,6 @@ function removeDuplicateCards(cards: CardDetails[]): CardDetails[] {
   });
 }
 
-async function scrapeMagicHothub(card: string): Promise<any> {
-  const baseUrl = `http://localhost:5000/api/magiccards?card=${encodeURIComponent(card)}`;
-  let url = null;
-  let index = 0;
-  let allCards: any[] = [];
-
-  while (true) {
-    try {
-      if (index === 0) {
-        url = baseUrl;
-      } else {
-        url = `${baseUrl}&page=${index.toString()}`;
-      }
-
-      try {
-        // Send request to the proxy backend instead of the external API
-        const { data } = await axios.get(url);
-        const $ = cheerio.load(data);
-        const cards: any[] = [];
-
-        $('.commerce-product-field-commerce-price').each((i: number, elem: any) => {
-          const name = $(elem).closest('.group-descript').find('h2 a').text().trim();
-          const stock = parseInt($(elem).closest('.group-descript').find('.commerce-product-field-commerce-stock .field-item').text().trim());
-          const match = name.match(/^\((.*?)\)\s*(.+)$/);
-          let cardname = name;
-          let details = null;
-          if (match) {
-            cardname = match[2].trim();
-            details = match[1].trim();
-          }
-
-          const price = $(elem).find('.price-amount').text().trim().slice(1);
-          const finish = $(elem).closest('.group-descript').find('.commerce-product-field-field-foil .field-item').text().trim();
-          const set = $(elem).closest('.group-descript').find('.commerce-product-field-field-set li').text().trim();
-          const condition = $(elem).closest('.group-descript').find('.commerce-product-field-field-condition li').text().trim();
-
-          if (stock === 0) {
-            return;
-          } else if (cardname.toLowerCase() !== card.toLowerCase()) {
-            return;
-          }
-          cards.push({
-            store: "Magic Hothub",
-            cardname,
-            details,
-            set,
-            price: parseFloat(price),
-            condition,
-            stock,
-            finish,
-          });
-        });
-
-        if (cards.length === 0) {
-          break;
-        }
-
-        allCards.push(...cards);
-        index++;
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    } catch (error) {
-      console.error(error);
-      break;
-    }
-  }
-
-  allCards = removeDuplicateCards(allCards);
-  return allCards;
-}
-
 export default async function scrape(card:string) {
   const hothub_res = await fetch(`http://localhost:5000/api/magiccards?card=${encodeURIComponent(card)}`);
   const hothub = await hothub_res.json();
@@ -168,11 +96,6 @@ export default async function scrape(card:string) {
   console.log(sortedCards)
   return sortedCards
 }
-
-// scrapeMtgMate("Firebolt")
-// const card = 'Firebolt'
-// const hothub_res = await fetch(`http://localhost:5000/api/magiccards?card=${encodeURIComponent(card)}`);
-// console.log(hothub_res)
 
 // (async () => {
 //   const card = 'Firebolt';
