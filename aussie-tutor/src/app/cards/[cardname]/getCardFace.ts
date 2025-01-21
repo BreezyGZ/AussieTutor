@@ -1,7 +1,6 @@
 import { CardDetails } from "@/app/interfaces";
-
-const axios = require('axios');
-const fuzzysort = require('fuzzysort');
+import axios from 'axios';
+import fuzzysort from 'fuzzysort';
 
 interface MTGSet {
   name: string;
@@ -38,7 +37,7 @@ async function fetchSetNameToCodeMap(): Promise<Record<string, string>> {
 }
 
 // Get set code with fuzzy matching, using cached data
-async function getSetCode(setName: string, threshold: number = 80): Promise<string> {
+async function getSetCode(setName: string, threshold: number = 80): Promise<string | null> {
   const nameToCode = await fetchSetNameToCodeMap();
   const setNames = Object.keys(nameToCode);
 
@@ -62,11 +61,14 @@ async function getSetCode(setName: string, threshold: number = 80): Promise<stri
     }
   }
 
-  return `Set name '${setName}' not found in Scryfall database.`;
+  return null;
 }
 
 export default async function getCardFace(card: CardDetails) {
   const setCode = await getSetCode(card.set)
+  if (!setCode) {
+    return ""
+  }
   let extraSearchParams = ""
   if (card.details) {
     if (card.details.includes("Retro") || card.details.includes("retro")) {

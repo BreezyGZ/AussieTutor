@@ -71,6 +71,7 @@ app.get('/api/magiccards', async (req, res, next) => {
             condition,
             stock,
             finish,
+            image: null
           });
         });
         // console.log(cards)

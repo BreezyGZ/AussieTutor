@@ -1,6 +1,5 @@
 "use client";
-const axios = require('axios');
-
+import axios from 'axios';
 import { useEffect, useState } from "react";
 import { useRouter } from 'next/navigation';
 import './globals.css'

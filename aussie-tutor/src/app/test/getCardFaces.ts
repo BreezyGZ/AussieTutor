@@ -18,7 +18,6 @@ async function fetchSetNameToCodeMap(): Promise<Record<string, string>> {
   // If not in cache, fetch data from Scryfall API
   const url = "https://api.scryfall.com/sets";
   try {
-    console.log("Fetching from API...");
     const response = await axioscf.get(url);
     const setsData: MTGSet[] = response.data.data;
 

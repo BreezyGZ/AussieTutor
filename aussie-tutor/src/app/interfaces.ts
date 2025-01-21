@@ -11,4 +11,5 @@ export interface CardDetails {
   set: string;
   stock: number;
   store: string;
+  image: string | null;
 }

@@ -4,7 +4,7 @@ import * as cheerio from 'cheerio';
 
 // URL to scrape
 const MTGMATE_URL = 'https://www.mtgmate.com.au/cards/search?q=';
-const MAGICCARDS_URL = 'https://magiccards.com.au/search/product?search_api_views_fulltext='
+// const MAGICCARDS_URL = 'https://magiccards.com.au/search/product?search_api_views_fulltext='
 
 async function scrapeMtgMate(card: string): Promise<any[]> {
   try {
@@ -22,7 +22,6 @@ async function scrapeMtgMate(card: string): Promise<any[]> {
 
     for (const key in parsedData) {
       // console.log(parsedData[key])
-      
       const name = parsedData[key].name;
       const stock = parsedData[key].quantity;
       const price = parsedData[key].price / 100;
@@ -49,7 +48,8 @@ async function scrapeMtgMate(card: string): Promise<any[]> {
         price,
         condition: parsedData[key].condition,
         stock,
-        finish: parsedData[key].finish
+        finish: parsedData[key].finish,
+        image: parsedData[key].image
       });
     }
     // console.log(cleanData)
@@ -61,40 +61,43 @@ async function scrapeMtgMate(card: string): Promise<any[]> {
   }
 }
 
-function removeDuplicateCards(cards: CardDetails[]): CardDetails[] {
-  const seen = new Set<string>();
-  return cards.filter(card => {
-    const identifier = `
-      ${card.cardname.toLowerCase()}|
-      ${(card.details?.toLowerCase() || '')}|
-      ${(card.set?.toLowerCase() || '')}|
-      ${(card.price)}|
-      ${(card.condition?.toLowerCase() || '')}
-      ${(card.stock)}
-      ${(card.finish?.toLowerCase() || '')}|
-    `;
+// function removeDuplicateCards(cards: CardDetails[]): CardDetails[] {
+//   const seen = new Set<string>();
+//   return cards.filter(card => {
+//     const identifier = `
+//       ${card.cardname.toLowerCase()}|
+//       ${(card.details?.toLowerCase() || '')}|
+//       ${(card.set?.toLowerCase() || '')}|
+//       ${(card.price)}|
+//       ${(card.condition?.toLowerCase() || '')}
+//       ${(card.stock)}
+//       ${(card.finish?.toLowerCase() || '')}|
+//     `;
 
-      if (seen.has(identifier)) {
-          return false;
-      }
-      seen.add(identifier);
-      return true;
-  });
-}
+//       if (seen.has(identifier)) {
+//           return false;
+//       }
+//       seen.add(identifier);
+//       return true;
+//   });
+// }
 
-export default async function scrape(card:string) {
-  const hothub_res = await fetch(`http://localhost:5000/api/magiccards?card=${encodeURIComponent(card)}`);
-  const hothub = await hothub_res.json();
-  // console.log(hothub)
+export default async function scrape(card: string): Promise<CardDetails[]> {
+  try {
+    // Fetch data from both APIs concurrently
+    const [hothub_res, mate] = await Promise.all([
+      fetch(`http://localhost:5000/api/magiccards?card=${encodeURIComponent(card)}`),
+      scrapeMtgMate(card),
+    ]);
 
-  const mate = await scrapeMtgMate(card);
+    const hothub = hothub_res.ok ? await hothub_res.json() : [];
 
-  let allCards = [...hothub, ...mate]
-  // let allCards = [...mate]
-  const sortedCards = allCards.sort((a, b) => a.price - b.price)
-
-  console.log(sortedCards)
-  return sortedCards
+    const allCards = [...hothub, ...mate];
+    return allCards.sort((a, b) => a.price - b.price);
+  } catch (error) {
+    console.error("Error scraping card data:", error);
+    return [];
+  }
 }
 
 // (async () => {
