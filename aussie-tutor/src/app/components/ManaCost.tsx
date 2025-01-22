@@ -1,5 +1,4 @@
 import React from "react";
-import "@/../public/mana-master/css/mana.css";
 
 interface ManaCostProps {
   manaCost: string;

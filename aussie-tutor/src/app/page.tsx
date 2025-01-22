@@ -24,12 +24,12 @@ async function getPartialMatches(partial: string) {
 
     return a.localeCompare(b);
   });
-  return sortedCards.map((str: string) => str.length > 31 ? str.slice(0, 28) + '...' : str);;
+  return sortedCards;
 }
 
 export default function Home() {
-  const [search, setSearch] = useState("")
-  const [matches, setMatches] = useState([])
+  const [search, setSearch] = useState<string>("")
+  const [matches, setMatches] = useState<string[]>([])
   const router = useRouter();
 
   useEffect(() => {
@@ -63,7 +63,7 @@ export default function Home() {
           <div className="matchlist">
             {matches.slice(0, 10).map((item, index) => (
               <div key={index} className="match" onClick={() => {router.push(`/cards/${item}`)}}>
-                {item}
+                {item.length > 31 ? item.slice(0, 28) + '...' : item }
               </div>
             ))}
           </div>  

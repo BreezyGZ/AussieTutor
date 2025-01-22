@@ -6,7 +6,8 @@ import * as cheerio from 'cheerio';
 const MTGMATE_URL = 'https://www.mtgmate.com.au/cards/search?q=';
 // const MAGICCARDS_URL = 'https://magiccards.com.au/search/product?search_api_views_fulltext='
 
-async function scrapeMtgMate(card: string): Promise<any[]> {
+async function scrapeMtgMate(cardURI: string): Promise<any[]> {
+  const card = decodeURIComponent(cardURI);
   try {
     const { data } = await axios.get(MTGMATE_URL + card);
     const $ = cheerio.load(data);
@@ -33,7 +34,7 @@ async function scrapeMtgMate(card: string): Promise<any[]> {
           cardname = match[1].trim();
           details = match[2].trim();
       }
-
+      console.log(`Looking for: ${card}, Found: ${cardname}`)
       if (stock === 0) {
         continue;
       }
@@ -52,7 +53,8 @@ async function scrapeMtgMate(card: string): Promise<any[]> {
         image: parsedData[key].image
       });
     }
-    // console.log(cleanData)
+    console.log("MTGMate")
+    console.log(cleanData)
     return cleanData;
   } 
   catch (error) {

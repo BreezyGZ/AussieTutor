@@ -47,7 +47,7 @@ function InfoPanel({ card }: InfoPanelProps): JSX.Element {
   }, [card]);
 
   return (
-    <div className="flex gap-4 bg-blue-500 p-8">
+    <div className="flex gap-4 bg-at-yellow p-8">
       
       <div className="flex flex-col items-center w-1/2">
         <img src={face || undefined} width={146} height={204}></img>
@@ -67,7 +67,7 @@ function InfoPanel({ card }: InfoPanelProps): JSX.Element {
 } 
 
 export default function Card() {
-  const { cardname } = useParams<{ cardname: string | string[] | undefined }>();
+  const { cardname } = useParams<{ cardname: string | undefined }>();
   const [data, setData] = useState<CardDetails[]>([]);
   const [flavor, setFlavor] = useState<string>("")
   const [manaCost, setManaCost] = useState<string>("")
@@ -109,12 +109,12 @@ export default function Card() {
   return (
     <div className="flex justify-center">
       <div className="flex flex-col items-center">
-        <div className="flex items-center space-x-10">
-          <h1 className="text-blue-100">{cardname}</h1>
+        <div className="flex items-center space-x-8 py-5 px-10">
+          <h1 className="">{cardname && decodeURIComponent(cardname)}</h1>
           <ManaCost manaCost={manaCost}/>
         </div>
         
-        <p>{flavor}</p>
+        <p className="w-2/3">{flavor}</p>
         <div className="flex">
 
           <div className="flex flex-col gap-4">
