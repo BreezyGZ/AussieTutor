@@ -3,12 +3,23 @@ import * as cheerio from 'cheerio';
 import axios from 'axios';
 import cors from 'cors';
 import { removeDuplicateCards } from './helpers.js';
+import fs from "fs"
 const app = express();
 const PORT = 5000;
 const MAGICHOTHUB_URL = "https://magiccards.com.au"
 // Enable CORS for local development
 app.use(cors());
 
+app.get('/api/allcards', async (req, res, next) => {
+  try {
+    const fileContent = await fs.promises.readFile('../public/allCards.txt', 'utf8');
+    const cardNames = JSON.parse(fileContent);
+    res.status(200).json(cardNames); // Respond with card names
+  } catch (error) {
+    console.error('Error reading file:', error);
+    res.status(500).json({ message: 'Error reading the file' });
+  }
+})
 // Magic Hothub
 app.get('/api/magiccards', async (req, res, next) => { 
     const card = req.query.card;
