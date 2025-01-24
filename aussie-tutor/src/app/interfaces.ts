@@ -12,4 +12,5 @@ export interface CardDetails {
   stock: number;
   store: string;
   image: string | null;
+  link: string;
 }

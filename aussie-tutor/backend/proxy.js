@@ -5,7 +5,7 @@ import cors from 'cors';
 import { removeDuplicateCards } from './helpers.js';
 const app = express();
 const PORT = 5000;
-
+const MAGICHOTHUB_URL = "https://magiccards.com.au"
 // Enable CORS for local development
 app.use(cors());
 
@@ -16,9 +16,7 @@ app.get('/api/magiccards', async (req, res, next) => {
       res.status(400).json({ error: 'Missing "card" query parameter' });
       return;
     }
-    const baseUrl = `https://magiccards.com.au/search/product?search_api_views_fulltext=${encodeURIComponent(
-      card
-    )}`;
+    const baseUrl = `${MAGICHOTHUB_URL}/search/product?search_api_views_fulltext=${encodeURIComponent(card)}`;
     console.log(`Received request for card: ${req.query.card}`);
     // console.log(`Fetching URL: ${targetUrl}`);
 
@@ -42,6 +40,8 @@ app.get('/api/magiccards', async (req, res, next) => {
 
         $('.commerce-product-field-commerce-price').each((i, elem) => {
           const name = $(elem).closest('.group-descript').find('h2 a').text().trim();
+          const link = $(elem).closest('.group-descript').find('h2 a').attr('href');
+          // console.log(link)
           const stock = parseInt($(elem).closest('.group-descript').find('.commerce-product-field-commerce-stock .field-item').text().trim());
           const match = name.match(/^\((.*?)\)\s*(.+)$/);
           let cardname = name;
@@ -71,7 +71,8 @@ app.get('/api/magiccards', async (req, res, next) => {
             condition,
             stock,
             finish,
-            image: null
+            image: null,
+            link: `${MAGICHOTHUB_URL}${link}`,
           });
         });
         // console.log(cards)

@@ -10,6 +10,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@saeris/typeface-beleren-bold": "^1.0.1",
     "autoprefixer": "^10.4.20",
     "axios": "^1.7.9",
     "cheerio": "^1.0.0",

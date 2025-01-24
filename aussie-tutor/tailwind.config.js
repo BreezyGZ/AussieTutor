@@ -11,7 +11,15 @@ module.exports = {
         'at-green': '#E4ECCA',
         'at-white': '#F0E7DA',
         'at-yellow': '#FEFEE3'
-      }
+      },
+      fontFamily: {
+        beleren: ['Beleren-Bold', 'Arial', 'sans-serif'],
+        belerenSmallCaps: ['Beleren-SmallCaps-Bold', 'Arial', 'sans-serif'],
+        belerenItalic: ['Beleren-SmallCaps-BoldItalic', 'Arial', 'sans-serif'],
+        mplantin: ['MPlantin', 'Arial', 'sans-serif'],
+        magic: ['magic-font', 'sans-serif'],
+        matrix: ['Matrix-Bold', 'sans-serif'],
+      },
     },
   },
   plugins: [],

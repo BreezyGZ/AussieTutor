@@ -3,13 +3,13 @@ import axios from 'axios';
 import * as cheerio from 'cheerio';
 
 // URL to scrape
-const MTGMATE_URL = 'https://www.mtgmate.com.au/cards/search?q=';
+const MTGMATE_URL = 'https://www.mtgmate.com.au';
 // const MAGICCARDS_URL = 'https://magiccards.com.au/search/product?search_api_views_fulltext='
 
 async function scrapeMtgMate(cardURI: string): Promise<any[]> {
   const card = decodeURIComponent(cardURI);
   try {
-    const { data } = await axios.get(MTGMATE_URL + card);
+    const { data } = await axios.get(`${MTGMATE_URL}/cards/search?q=${card}`);
     const $ = cheerio.load(data);
     const reactProps = $('div[data-react-class="FilterableTable"]').attr('data-react-props');
 
@@ -26,6 +26,7 @@ async function scrapeMtgMate(cardURI: string): Promise<any[]> {
       const name = parsedData[key].name;
       const stock = parsedData[key].quantity;
       const price = parsedData[key].price / 100;
+      const link = `${MTGMATE_URL}${parsedData[key].link_path}`
       const match = name.match(/^(.*?)\s*\((.*?)\)$/);
       let cardname = name;
       let details = null;
@@ -34,7 +35,7 @@ async function scrapeMtgMate(cardURI: string): Promise<any[]> {
           cardname = match[1].trim();
           details = match[2].trim();
       }
-      console.log(`Looking for: ${card}, Found: ${cardname}`)
+      // console.log(`Looking for: ${card}, Found: ${cardname}`)
       if (stock === 0) {
         continue;
       }
@@ -50,7 +51,8 @@ async function scrapeMtgMate(cardURI: string): Promise<any[]> {
         condition: parsedData[key].condition,
         stock,
         finish: parsedData[key].finish,
-        image: parsedData[key].image
+        image: parsedData[key].image,
+        link
       });
     }
     console.log("MTGMate")

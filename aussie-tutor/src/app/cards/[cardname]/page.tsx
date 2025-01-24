@@ -7,14 +7,12 @@ import { JSX, useEffect, useState } from "react";
 import {InfoPanelProps, CardDetails} from '@/app/interfaces.js'
 import Image, { StaticImageData } from "next/image";
 import axios from "axios";
-import magicHothubLogo from '@/assets/magichothub-logo.jpg'
-import mtgmateLogo from '@/assets/mtgmate-logo.png'
-import pacifism from '@/assets/fdn-501-pacifism.jpg'
-// import '../../globals.css';
+// import magicHothubLogo from '@/assets/magichothub-logo.jpg'
+// import mtgmateLogo from '@/assets/mtgmate-logo.png'
+// import pacifism from '@/assets/fdn-501-pacifism.jpg'
 import '@/app/globals.css';
-// import '@/app/components/ManaCost.jsx'
+// import "@saeris/typeface-beleren-bold"
 import ManaCost from "@/app/components/ManaCost";
-// import './cards.css';
 
 function InfoPanel({ card }: InfoPanelProps): JSX.Element {
   const [face, setFace] = useState<string>("")
@@ -47,17 +45,22 @@ function InfoPanel({ card }: InfoPanelProps): JSX.Element {
   }, [card]);
 
   return (
-    <div className="flex gap-4 bg-at-yellow p-8">
+    <div 
+      className="flex w-96 gap-4 bg-at-yellow py-7 pl-4 justify-center gap-5 hover:bg-at-red hover:cursor-point duration-150" 
+      onClick={() => window.location.href = card.link}
+    >
       
-      <div className="flex flex-col items-center w-1/2">
+      <div className="flex flex-col items-center">
         <img src={face || undefined} width={146} height={204}></img>
         <p>{priceString}</p>
       </div>
       <div className="w-1/2">
         {/* {logo && <Image src={logo} alt={card.store} width={130} height={50}/>} */}
-        {card.store === "Magic Hothub" && <Image src={magicHothubLogo} alt="Magic HotHub" width={130} height={50}/>}
-        {card.store === "MTGMate" && <Image src={mtgmateLogo} alt="MtgMate" width={130} height={50}/>}
-        <p>{description}</p>  
+        {/* {card.store === "Magic Hothub" && <Image src={magicHothubLogo} alt="Magic HotHub" width={130} height={50}/>} */}
+        {card.store === "Magic Hothub" && <Image src="/assets/magichothub-logo.jpg" alt="Magic HotHub" width={130} height={50}/>}
+        {/* {card.store === "MTGMate" && <Image src={mtgmateLogo} alt="MtgMate" width={130} height={50}/>} */}
+        {card.store === "MTGMate" && <Image src="/assets/mtgmate-logo.png" alt="MtgMate" width={130} height={50}/>}
+        <p className="font-beleren text- break-words">{description}</p>  
         <p>Condition: {card.condition}</p>
         <p>Finish: {card.finish}</p>
         <p>Stock: {card.stock}</p>
@@ -90,11 +93,11 @@ export default function Card() {
           return
         }
         setManaCost(data.data[0].mana_cost)
-        console.log(data.data)
+        // console.log(data.data)
         for (const card of data.data) {
-          console.log(card)
+          // console.log(card)
           if (card.flavor_text) {
-            setFlavor(card.flavor_text);
+            setFlavor(`${card.flavor_text}`);
             break;
           }
         }
@@ -108,16 +111,16 @@ export default function Card() {
 
   return (
     <div className="flex justify-center">
-      <div className="flex flex-col items-center">
-        <div className="flex items-center space-x-8 py-5 px-10">
-          <h1 className="">{cardname && decodeURIComponent(cardname)}</h1>
+      <div className="flex flex-col items-center w-full">
+        <div className="flex items-center space-x-8 pt-5 px-10">
+          <h1 className="font-beleren">{cardname && decodeURIComponent(cardname)}</h1>
           <ManaCost manaCost={manaCost}/>
         </div>
         
-        <p className="w-2/3">{flavor}</p>
-        <div className="flex">
+        {flavor && <p className="w-2/3 text-center italic py-3">{flavor}</p>}
+        <div className="flex items-center justify-center w-full">
 
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-wrap flex-row justify-center w-2/3 gap-4">
             {data.map((card: CardDetails, index) => (
               <InfoPanel key={index} card={card} />
             ))}

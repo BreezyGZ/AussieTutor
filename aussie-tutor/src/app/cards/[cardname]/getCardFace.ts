@@ -67,7 +67,7 @@ async function getSetCode(setName: string, threshold: number = 80): Promise<stri
 export default async function getCardFace(card: CardDetails) {
   const setCode = await getSetCode(card.set)
   if (!setCode) {
-    return ""
+    return "/assets/damaged_mtg_back.png"
   }
   let extraSearchParams = ""
   if (card.details) {
