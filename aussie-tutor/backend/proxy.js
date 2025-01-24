@@ -28,7 +28,7 @@ app.get('/api/magiccards', async (req, res, next) => {
       return;
     }
     const baseUrl = `${MAGICHOTHUB_URL}/search/product?search_api_views_fulltext=${encodeURIComponent(card)}`;
-    console.log(`Received request for card: ${req.query.card}`);
+    // console.log(`Received request for card: ${req.query.card}`);
     // console.log(`Fetching URL: ${targetUrl}`);
 
     let targetUrl = null
@@ -101,8 +101,8 @@ app.get('/api/magiccards', async (req, res, next) => {
     }
   }
   allCards = removeDuplicateCards(allCards);
-  console.log("allCards")
-  console.log(allCards)
+  // console.log("allCards")
+  // console.log(allCards)
   res.json(allCards);
 });
 
