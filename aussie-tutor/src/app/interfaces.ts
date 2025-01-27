@@ -9,7 +9,7 @@ export interface CardDetails {
   finish: string;
   price: number;
   set: string;
-  stock: number;
+  stock: number | string;
   store: string;
   image: string | null;
   link: string;
