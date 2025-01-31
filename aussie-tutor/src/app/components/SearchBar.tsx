@@ -87,7 +87,8 @@ export default function SearchBar() {
             key={index}
             className="pl-2 hover:bg-gray-200 cursor-pointer"
             onClick={() => {
-              router.push(`/cards/${item}`);
+              router.push(`/cards/${encodeURIComponent(item)}`);
+              console.log(encodeURIComponent(item))
             }}
           >
             {item.length > 31 ? item.slice(0, 28) + '...' : item}
