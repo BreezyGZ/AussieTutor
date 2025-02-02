@@ -1,11 +1,17 @@
 "use client";
-import axios from 'axios';
+// import axios from 'axios';
+import fs from "fs/promises"
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from 'next/navigation';
 
 async function getPartialMatches(partial: string) {
-  const { data } = await axios.get("https://api.scryfall.com/catalog/card-names");
-  const allCards = data.data.filter((s: string) => !s.startsWith('A-'));
+  // const { data } = await axios.get("https://api.scryfall.com/catalog/card-names");
+  // const allCards = data.data.filter((s: string) => !s.startsWith('A-'));
+  const response = await fetch('http://localhost:5000/api/allCards');
+  // console.log(response)
+  const allCards = await response.json()
+  // console.log(allCards)
+
   const filteredCards = allCards.filter((card: string) =>
     card.toLowerCase().includes(partial.toLowerCase())
   );
@@ -81,7 +87,8 @@ export default function SearchBar() {
             key={index}
             className="pl-2 hover:bg-gray-200 cursor-pointer"
             onClick={() => {
-              router.push(`/cards/${item}`);
+              router.push(`/cards/${encodeURIComponent(item)}`);
+              console.log(encodeURIComponent(item))
             }}
           >
             {item.length > 31 ? item.slice(0, 28) + '...' : item}
