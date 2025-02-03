@@ -1,6 +1,6 @@
 "use client";
 // import axios from 'axios';
-import fs from "fs/promises"
+// import fs from "fs/promises"
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from 'next/navigation';
 
@@ -88,7 +88,7 @@ export default function SearchBar() {
             className="pl-2 hover:bg-gray-200 cursor-pointer"
             onClick={() => {
               router.push(`/cards/${encodeURIComponent(item)}`);
-              console.log(encodeURIComponent(item))
+              // console.log(encodeURIComponent(item))
             }}
           >
             {item.length > 31 ? item.slice(0, 28) + '...' : item}

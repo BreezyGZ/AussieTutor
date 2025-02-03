@@ -115,7 +115,7 @@ app.get('/api/gamesportal', async (req, res, next) => {
       return;
     }
   
-    const regex = /^(.+?)\s*(?:\((.*?)\))?\s*\[(.+?)\]$/;
+    // const regex = /^(.+?)\s*(?:\((.*?)\))?\s*\[(.+?)\]$/;
 
     try {
       let links = new Map();
@@ -129,7 +129,7 @@ app.get('/api/gamesportal', async (req, res, next) => {
         const cardname = match[1]
   
         if (cardname.trim() !== decodeURI(card)) {
-          console.log(`Not a match ${title}`)
+          // console.log(`Not a match ${title}`)
           return;
         }
         const info = {
@@ -140,23 +140,21 @@ app.get('/api/gamesportal', async (req, res, next) => {
         links.set(title, info)
         // console.log(title)
       })
-      console.log(links)
+      // console.log(links)
   
       let allCards = []
       const matchedDivs = $('div[id^="productCardList2-js-"]');
       matchedDivs.each((i, element) => {
         let json = JSON.parse($(element).attr('data-product-variants').replace(/&quot;/g, '"'));
-        
-  
         json.forEach((rawCard, index) => {
           // console.log(rawCard.name)
           const match = rawCard.name.match(/^([^\[\(\]]+)/);
           const cardname = match[1]
   
           if (cardname.trim() !== decodeURI(card)) {
-            console.log(`Not a match ${rawCard.name}`)
-            console.log(cardname.trim())
-            console.log(card.trim())
+            // console.log(`Not a match ${rawCard.name}`)
+            // console.log(cardname.trim())
+            // console.log(card.trim())
             return;
           }
           if (!rawCard.available) {
