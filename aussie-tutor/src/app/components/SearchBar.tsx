@@ -3,11 +3,12 @@
 // import fs from "fs/promises"
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from 'next/navigation';
+import { BACKEND_URL } from '@/app/backendConfig'
 
 async function getPartialMatches(partial: string) {
   // const { data } = await axios.get("https://api.scryfall.com/catalog/card-names");
   // const allCards = data.data.filter((s: string) => !s.startsWith('A-'));
-  const response = await fetch('http://localhost:5000/api/allCards');
+  const response = await fetch(`${BACKEND_URL}/api/allCards`);
   // console.log(response)
   const allCards = await response.json()
   // console.log(allCards)
