@@ -2,10 +2,11 @@
 
 import scrape from "./scrape"
 import getCardFace from "./getCardFace";
-import { useParams, useRouter } from 'next/navigation'
+// import { useParams, useRouter } from 'next/navigation'
+import { useParams } from 'next/navigation'
 import { JSX, useEffect, useState } from "react";
 import {InfoPanelProps, CardDetails} from '@/app/interfaces.js'
-import Image, { StaticImageData } from "next/image";
+import Image from "next/image";
 import axios from "axios";
 // import magicHothubLogo from '@/assets/magichothub-logo.jpg'
 // import mtgmateLogo from '@/assets/mtgmate-logo.png'
@@ -76,6 +77,7 @@ export default function Card() {
   const [manaCost, setManaCost] = useState<string>("{}")
 
   const decodedCardname = cardname ? decodeURIComponent(cardname) : undefined;
+  // const router = useRouter();
 
   useEffect(() => {
     const fetchData = async () => {
