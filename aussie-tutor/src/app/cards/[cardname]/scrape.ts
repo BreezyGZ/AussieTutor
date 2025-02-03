@@ -1,10 +1,9 @@
 import { CardDetails } from "../../interfaces.js";
 import axios from 'axios';
 import * as cheerio from 'cheerio';
-
+import { BACKEND_URL } from '@/app/backendConfig'
 // URL to scrape
 const MTGMATE_URL = 'https://www.mtgmate.com.au';
-const BACKEND_URL = 'http://localhost:5000'
 // const MAGICCARDS_URL = 'https://magiccards.com.au/search/product?search_api_views_fulltext='
 
 async function scrapeMtgMate(cardURI: string): Promise<CardDetails[]> {
