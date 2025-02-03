@@ -4,6 +4,7 @@ import * as cheerio from 'cheerio';
 
 // URL to scrape
 const MTGMATE_URL = 'https://www.mtgmate.com.au';
+const BACKEND_URL = 'http://localhost:5000'
 // const MAGICCARDS_URL = 'https://magiccards.com.au/search/product?search_api_views_fulltext='
 
 async function scrapeMtgMate(cardURI: string): Promise<CardDetails[]> {
@@ -89,8 +90,8 @@ async function scrapeMtgMate(cardURI: string): Promise<CardDetails[]> {
 export default async function scrape(card: string): Promise<CardDetails[]> {
   try {
     const [hothub_res, gamesportal_res, mate] = await Promise.all([
-      fetch(`http://localhost:5000/api/magiccards?card=${encodeURIComponent(card)}`),
-      fetch(`http://localhost:5000/api/gamesportal?card=${encodeURIComponent(card)}`),
+      fetch(`${BACKEND_URL}/api/magiccards?card=${encodeURIComponent(card)}`),
+      fetch(`${BACKEND_URL}/api/gamesportal?card=${encodeURIComponent(card)}`),
       scrapeMtgMate(card),
     ]);
 
