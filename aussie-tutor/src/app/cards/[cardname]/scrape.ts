@@ -88,6 +88,7 @@ async function scrapeMtgMate(cardURI: string): Promise<CardDetails[]> {
 
 export default async function scrape(card: string): Promise<CardDetails[]> {
   try {
+    console.log(BACKEND_URL)
     const [hothub_res, gamesportal_res, mate] = await Promise.all([
       fetch(`${BACKEND_URL}/api/magiccards?card=${encodeURIComponent(card)}`),
       fetch(`${BACKEND_URL}/api/gamesportal?card=${encodeURIComponent(card)}`),
