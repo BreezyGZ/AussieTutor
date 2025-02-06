@@ -1,5 +1,5 @@
-const axiosmc = require('axios');
-const cheeriomc = require('cheerio');
+import axios from 'axios';
+import * as cheerio from 'cheerio';
 
 const urlmc = 'https://magiccards.com.au/search/product?search_api_views_fulltext=giant growth&page=';
 
@@ -16,8 +16,8 @@ async function scrapeDataMC(url: string): Promise<any> {
             if (index === 0) {
 
             }
-            const { data } = await axiosmc.get(url + index.toString());
-            const $ = cheeriomc.load(data);
+            const { data } = await axios.get(url + index.toString());
+            const $ = cheerio.load(data);
 
             // Extract card data
             const cards: any[] = [];

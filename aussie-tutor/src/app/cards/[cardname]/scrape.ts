@@ -1,7 +1,7 @@
 import { CardDetails } from "../../interfaces.js";
 import axios from 'axios';
 import * as cheerio from 'cheerio';
-
+import { BACKEND_URL } from '@/app/backendConfig'
 // URL to scrape
 const MTGMATE_URL = 'https://www.mtgmate.com.au';
 // const MAGICCARDS_URL = 'https://magiccards.com.au/search/product?search_api_views_fulltext='
@@ -89,17 +89,18 @@ async function scrapeMtgMate(cardURI: string): Promise<CardDetails[]> {
 export default async function scrape(card: string): Promise<CardDetails[]> {
   try {
     // Fetch data from both APIs concurrently
-    const [hothub_res, goodgames_res, mate] = await Promise.all([
-      fetch(`http://localhost:5000/api/magiccards?card=${encodeURIComponent(card)}`),
-      fetch(`http://localhost:5000/api/goodgames?card=${encodeURIComponent(card)}`),
+    const [hothub_res, gamesportal_res, goodgames_res, mate] = await Promise.all([
+      fetch(`${BACKEND_URL}/api/magiccards?card=${encodeURIComponent(card)}`),
+      fetch(`${BACKEND_URL}/api/gamesportal?card=${encodeURIComponent(card)}`),
+      fetch(`${BACKEND_URL}/api/goodgames?card=${encodeURIComponent(card)}`),
       scrapeMtgMate(card),
     ]);
 
     const hothub = hothub_res.ok ? await hothub_res.json() : [];
     const goodgames = goodgames_res.ok ? await goodgames_res.json() : [];
-    console.log(goodgames)
+    const gamesportal = gamesportal_res.ok ? await gamesportal_res.json() : [];
+    const allCards = [...hothub, ...gamesportal, ...mate, ...goodgames];
 
-    const allCards = [...hothub, ...mate, ...goodgames];
     return allCards.sort((a, b) => a.price - b.price);
   } catch (error) {
     console.error("Error scraping card data:", error);
