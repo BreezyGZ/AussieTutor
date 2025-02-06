@@ -6,7 +6,7 @@ import * as cheerio from 'cheerio';
 const MTGMATE_URL = 'https://www.mtgmate.com.au';
 // const MAGICCARDS_URL = 'https://magiccards.com.au/search/product?search_api_views_fulltext='
 
-async function scrapeMtgMate(cardURI: string): Promise<any[]> {
+async function scrapeMtgMate(cardURI: string): Promise<CardDetails[]> {
   const card = decodeURIComponent(cardURI);
   try {
     const { data } = await axios.get(`${MTGMATE_URL}/cards/search?q=${card}`);
@@ -19,7 +19,7 @@ async function scrapeMtgMate(cardURI: string): Promise<any[]> {
     }
     const parsedData = JSON.parse(reactProps).uuid;
     // console.log(parsedData)
-    let cleanData = [];
+    const cleanData = [];
 
     for (const key in parsedData) {
       // console.log(parsedData[key])
