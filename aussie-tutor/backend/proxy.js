@@ -2,6 +2,7 @@ import express from 'express';
 import * as cheerio from 'cheerio';
 import axios from 'axios';
 import cors from 'cors';
+import scrapeGoodGames from './scrapeGoodGames.js'
 import { removeDuplicateCards, parseCardString } from './helpers.js';
 import fs from "fs"
 
@@ -103,10 +104,21 @@ app.get('/api/magiccards', async (req, res, next) => {
     }
   }
   allCards = removeDuplicateCards(allCards);
-  // console.log("allCards")
-  // console.log(allCards)
   res.json(allCards);
 });
+
+
+app.get('/api/goodgames', async (req, res, next) => {
+  const card = req.query.card;
+  if (!card) {
+    res.status(400).json({ error: 'Missing "card" query parameter' });
+    return;
+  }
+  const data = await scrapeGoodGames(card)
+  console.log(data)
+    
+  res.json(data)
+}
 
 app.get('/api/gamesportal', async (req, res, next) => {
   const card = req.query.card;

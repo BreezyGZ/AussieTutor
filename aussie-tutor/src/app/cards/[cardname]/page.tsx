@@ -60,7 +60,9 @@ function InfoPanel({ card }: InfoPanelProps): JSX.Element {
         {/* {logo && <Image src={logo} alt={card.store} width={130} height={50}/>} */}
         {card.store === "Magic Hothub" && <Image src="/assets/magichothub-logo.jpg" alt="Magic HotHub" width={130} height={50}/>}
         {card.store === "MTGMate" && <Image src="/assets/mtgmate-logo.png" alt="MtgMate" width={130} height={50}/>}
+        {card.store === "Good Games" && <Image src="/assets/goodgames-logo.png" alt="GoodGames" width={130} height={50}/>}
         {card.store === "Games Portal" && <Image src="/assets/gamesportal-logo.png" alt="Games Portal" width={130} height={50}/>}
+
         <p className="font-beleren text- break-words">{description}</p>  
         <p>Condition: {card.condition}</p>
         <p>Finish: {card.finish}</p>
