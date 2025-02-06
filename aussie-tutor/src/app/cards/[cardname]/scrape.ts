@@ -55,8 +55,8 @@ async function scrapeMtgMate(cardURI: string): Promise<CardDetails[]> {
         link
       });
     }
-    console.log("MTGMate")
-    console.log(cleanData)
+    // console.log("MTGMate")
+    // console.log(cleanData)
     return cleanData;
   } 
   catch (error) {
@@ -89,14 +89,17 @@ async function scrapeMtgMate(cardURI: string): Promise<CardDetails[]> {
 export default async function scrape(card: string): Promise<CardDetails[]> {
   try {
     // Fetch data from both APIs concurrently
-    const [hothub_res, mate] = await Promise.all([
+    const [hothub_res, goodgames_res, mate] = await Promise.all([
       fetch(`http://localhost:5000/api/magiccards?card=${encodeURIComponent(card)}`),
+      fetch(`http://localhost:5000/api/goodgames?card=${encodeURIComponent(card)}`),
       scrapeMtgMate(card),
     ]);
 
     const hothub = hothub_res.ok ? await hothub_res.json() : [];
+    const goodgames = goodgames_res.ok ? await goodgames_res.json() : [];
+    console.log(goodgames)
 
-    const allCards = [...hothub, ...mate];
+    const allCards = [...hothub, ...mate, ...goodgames];
     return allCards.sort((a, b) => a.price - b.price);
   } catch (error) {
     console.error("Error scraping card data:", error);
