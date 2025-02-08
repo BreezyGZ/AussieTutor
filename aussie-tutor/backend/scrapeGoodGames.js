@@ -23,7 +23,7 @@ function splitCardInfo(cardString) {
         return { cardname, details, set };
     }
     
-    return null; // Return null if the format doesn't match
+    return null;
 }
 
 function parseConditionFinish(input) {
@@ -40,9 +40,11 @@ function parseConditionFinish(input) {
     return { condition: input, finish: "" };
 }
 
-function formatGG2AT(obj) {
+function formatGG2AT(obj, cardname) {
     const match = splitCardInfo(obj.title)
-    // console.log(match)
+    if (match.cardname !== cardname) {
+        return []
+    }
 
     const allCards = []
 
@@ -70,7 +72,7 @@ function formatGG2AT(obj) {
 }
 
 export default async function scrapeGoodGames(cardURI) {
-    // const card = decodeURIComponent(cardURI);
+    const cardname = decodeURIComponent(cardURI);
 
     try {
         const { data } = await axios.get(`${URL}/search?q=${cardURI}&f_Availability=Exclude Out Of Stock`, {
@@ -92,7 +94,7 @@ export default async function scrapeGoodGames(cardURI) {
             // console.log(toJsonString(pairs[1]))
             const cleanData = parseRawJsonString(pairs[1])
             // console.log(cleanData)
-            const variants = formatGG2AT(cleanData)
+            const variants = formatGG2AT(cleanData, cardname)
             cards = [...cards, ...variants]
 
             

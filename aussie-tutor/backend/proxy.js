@@ -115,10 +115,10 @@ app.get('/api/goodgames', async (req, res, next) => {
     return;
   }
   const data = await scrapeGoodGames(card)
-  console.log(data)
+  // console.log(data)
     
   res.json(data)
-}
+});
 
 app.get('/api/gamesportal', async (req, res, next) => {
   const card = req.query.card;
@@ -201,8 +201,7 @@ app.get('/api/gamesportal', async (req, res, next) => {
     catch (error) {
       console.error(error)
     }
-  
-})
+});
 
 app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Internal Server Error' });
