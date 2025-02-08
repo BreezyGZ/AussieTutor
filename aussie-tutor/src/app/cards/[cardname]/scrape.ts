@@ -1,12 +1,12 @@
 import { CardDetails } from "../../interfaces.js";
 import axios from 'axios';
 import * as cheerio from 'cheerio';
-
+import { BACKEND_URL } from '@/app/backendConfig'
 // URL to scrape
 const MTGMATE_URL = 'https://www.mtgmate.com.au';
 // const MAGICCARDS_URL = 'https://magiccards.com.au/search/product?search_api_views_fulltext='
 
-async function scrapeMtgMate(cardURI: string): Promise<any[]> {
+async function scrapeMtgMate(cardURI: string): Promise<CardDetails[]> {
   const card = decodeURIComponent(cardURI);
   try {
     const { data } = await axios.get(`${MTGMATE_URL}/cards/search?q=${card}`);
@@ -19,7 +19,7 @@ async function scrapeMtgMate(cardURI: string): Promise<any[]> {
     }
     const parsedData = JSON.parse(reactProps).uuid;
     // console.log(parsedData)
-    let cleanData = [];
+    const cleanData = [];
 
     for (const key in parsedData) {
       // console.log(parsedData[key])
@@ -55,8 +55,8 @@ async function scrapeMtgMate(cardURI: string): Promise<any[]> {
         link
       });
     }
-    console.log("MTGMate")
-    console.log(cleanData)
+    // console.log("MTGMate")
+    // console.log(cleanData)
     return cleanData;
   } 
   catch (error) {
@@ -88,17 +88,19 @@ async function scrapeMtgMate(cardURI: string): Promise<any[]> {
 
 export default async function scrape(card: string): Promise<CardDetails[]> {
   try {
-    // Fetch data from both APIs concurrently
-    const [hothub_res, mate, ronin_res] = await Promise.all([
-      fetch(`http://localhost:5000/api/magiccards?card=${encodeURIComponent(card)}`),
+    const [hothub_res, gamesportal_res, goodgames_res, ronin_res, mate] = await Promise.all([
+      fetch(`${BACKEND_URL}/api/magiccards?card=${encodeURIComponent(card)}`),
+      fetch(`${BACKEND_URL}/api/gamesportal?card=${encodeURIComponent(card)}`),
+      fetch(`${BACKEND_URL}/api/goodgames?card=${encodeURIComponent(card)}`),
+      fetch(`${BACKEND_URL}/api/ronin?card=${encodeURIComponent(card)}`),
       scrapeMtgMate(card),
-      fetch(`http://localhost:5000/api/ronin?card=${encodeURIComponent(card)}`),
     ]);
-
     const hothub = hothub_res.ok ? await hothub_res.json() : [];
     const ronin = ronin_res.ok ? await ronin_res.json() : [];
+    const goodgames = goodgames_res.ok ? await goodgames_res.json() : [];
+    const gamesportal = gamesportal_res.ok ? await gamesportal_res.json() : [];
+    const allCards = [...hothub, ...gamesportal, ...mate, ...goodgames, ...ronin];
 
-    const allCards = [...hothub, ...mate, ...ronin];
     return allCards.sort((a, b) => a.price - b.price);
   } catch (error) {
     console.error("Error scraping card data:", error);

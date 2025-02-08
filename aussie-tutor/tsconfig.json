@@ -22,6 +22,6 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/backend.js", "backend/helpers.js", "backend/proxy.js"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/backend.js", "backend/helpers.js", "backend/proxy.js", "src/app/test/test.js"],
   "exclude": ["node_modules"]
 }
