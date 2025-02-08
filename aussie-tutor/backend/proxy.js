@@ -117,7 +117,7 @@ app.get('/api/ronin', async (req, res, next) => {
   const data = await scrapeRonin(card)
   res.json(data)
   // console.log(data)
-})
+});
 
 
 app.get('/api/goodgames', async (req, res, next) => {
@@ -129,6 +129,7 @@ app.get('/api/goodgames', async (req, res, next) => {
   }
   const data = await scrapeGoodGames(card) 
   res.json(data)
+  // console.log(data)
 });
 
 app.get('/api/gamesportal', async (req, res, next) => {

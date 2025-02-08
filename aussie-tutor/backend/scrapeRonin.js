@@ -70,7 +70,12 @@ export default async function scrapeRonin(cardURI) {
       if (match) {
         const parsedData = parseCleanJson(match[1])
         const title = splitCardInfo(parsedData.title)
+        // console.log(title)
+        if (!title) {
+          continue
+        }
         if (title.cardname !== cardname) {
+          console.log(title)
           continue;
         }
         for (const variant of parsedData.variants) {

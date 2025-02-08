@@ -42,7 +42,8 @@ function parseConditionFinish(input) {
 
 function formatGG2AT(obj, cardname) {
     const match = splitCardInfo(obj.title)
-    if (match.cardname !== cardname) {
+    // console.log(obj)
+    if (!match || match.cardname !== cardname) {
         return []
     }
 
