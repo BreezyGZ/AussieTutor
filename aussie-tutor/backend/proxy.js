@@ -3,6 +3,8 @@ import * as cheerio from 'cheerio';
 import axios from 'axios';
 import cors from 'cors';
 import { removeDuplicateCards } from './helpers.js';
+import scrapeRonin from './scrapeRonin.js'
+
 const app = express();
 const PORT = 5000;
 const MAGICHOTHUB_URL = "https://magiccards.com.au"
@@ -95,7 +97,16 @@ app.get('/api/magiccards', async (req, res, next) => {
   res.json(allCards);
 });
 
-
+app.get('/api/ronin', async (req, res, next) => {
+  const card = req.query.card;
+  if (!card) {
+    res.status(400).json({ error: 'Missing "card" query parameter' });
+    return;
+  }
+  const data = await scrapeRonin(card)
+  res.json(data)
+  // console.log(data)
+})
 
 app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Internal Server Error' });

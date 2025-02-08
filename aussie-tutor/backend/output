@@ -1,0 +1,75 @@
+[
+  {
+    cardname: 'Faithless Looting [Dark Ascension]',
+    condition: 'Near Mint',
+    details: '',
+    finish: '',
+    price: 150,
+    set: '',
+    stock: true,
+    store: 'RoninGames',
+    image: '//roningames.com.au/cdn/shop/products/42e2fe5f-3f45-540c-8894-7a5ebd31d41e.jpg?v=1692559458',
+    link: 'https://roningames.com.au/faithless-looting-dark-ascension'
+  },
+  {
+    cardname: 'Faithless Looting [Dark Ascension]',
+    condition: 'Lightly Played',
+    details: '',
+    finish: '',
+    price: 150,
+    set: '',
+    stock: true,
+    store: 'RoninGames',
+    image: '//roningames.com.au/cdn/shop/products/42e2fe5f-3f45-540c-8894-7a5ebd31d41e.jpg?v=1692559458',
+    link: 'https://roningames.com.au/faithless-looting-dark-ascension'
+  },
+  {
+    cardname: "Faithless Looting (Retro) [The Brothers' War Commander]",
+    condition: 'Near Mint',
+    details: '',
+    finish: '',
+    price: 1300,
+    set: '',
+    stock: true,
+    store: 'RoninGames',
+    image: null,
+    link: 'https://roningames.com.au/faithless-looting-retro-the-brothers-war-commander'
+  },
+  {
+    cardname: 'Faithless Looting (Japanese Foil Etched) [Strixhaven: School of Mages Mystical Archive]',
+    condition: 'Near Mint Foil',
+    details: '',
+    finish: '',
+    price: 6000,
+    set: '',
+    stock: true,
+    store: 'RoninGames',
+    image: null,
+    link: 'https://roningames.com.au/faithless-looting-japanese-etched-foil-strixhaven-mystical-archive'
+  },
+  {
+    cardname: 'Faithless Looting [The Lost Caverns of Ixalan Commander]',
+    condition: 'Near Mint',
+    details: '',
+    finish: '',
+    price: 100,
+    set: '',
+    stock: true,
+    store: 'RoninGames',
+    image: null,
+    link: 'https://roningames.com.au/faithless-looting-the-lost-caverns-of-ixalan-commander'
+  },
+  {
+    cardname: 'Faithless Looting [Strixhaven: School of Mages Mystical Archive]',
+    condition: 'Near Mint',
+    details: '',
+    finish: '',
+    price: 500,
+    set: '',
+    stock: true,
+    store: 'RoninGames',
+    image: null,
+    link: 'https://roningames.com.au/faithless-looting-strixhaven-mystical-archive'
+  }
+]
+6
