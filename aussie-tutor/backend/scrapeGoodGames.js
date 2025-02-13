@@ -42,7 +42,6 @@ function parseConditionFinish(input) {
 
 function formatGG2AT(obj, cardname) {
     const match = splitCardInfo(obj.title)
-    // console.log(obj)
     if (!match || match.cardname !== cardname) {
         return []
     }
@@ -50,7 +49,6 @@ function formatGG2AT(obj, cardname) {
     const allCards = []
 
     for (const variant of obj.variants) {
-        // console.log(variant)
         if (variant.inventory_quantity === 0) {
             continue;
         }
@@ -89,22 +87,16 @@ export default async function scrapeGoodGames(cardURI) {
 
 
         let cards = []
-        // console.log(cards)
         for (const match of jsonDataStrings) {
             const pairs = match.split(" = ")
-            // console.log(toJsonString(pairs[1]))
             const cleanData = parseRawJsonString(pairs[1])
-            // console.log(cleanData)
             const variants = formatGG2AT(cleanData, cardname)
-            cards = [...cards, ...variants]
-
-            
+            cards = [...cards, ...variants]   
         }
         return(cards)
 
-
     } catch (error) {
-        console.log(error)
+        console.error(error)
     }
 }
 
