@@ -2,23 +2,17 @@
 
 import scrape from "./scrape"
 import getCardFace from "./getCardFace";
-// import { useParams, useRouter } from 'next/navigation'
 import { useParams } from 'next/navigation'
 import { JSX, useEffect, useState } from "react";
 import {InfoPanelProps, CardDetails} from '@/app/interfaces.js'
 import Image from "next/image";
 import axios from "axios";
-// import magicHothubLogo from '@/assets/magichothub-logo.jpg'
-// import mtgmateLogo from '@/assets/mtgmate-logo.png'
-// import pacifism from '@/assets/fdn-501-pacifism.jpg'
 import '@/app/globals.css';
-// import "@saeris/typeface-beleren-bold"
 import ManaCost from "@/app/components/ManaCost";
+import LoadingWheel from "@/app/components/LoadingWheel";
 
 function InfoPanel({ card }: InfoPanelProps): JSX.Element {
   const [face, setFace] = useState<string>("")
-  
-  // const [logo, setLogo] = useState<any>(null)
   
   const priceString = '$' + card.price.toFixed(2).toString();
   const description = card.details ? `${card.set} (${card.details})` : card.set
@@ -36,13 +30,6 @@ function InfoPanel({ card }: InfoPanelProps): JSX.Element {
         console.error("Error fetching card face:", error);
       }
     };
-    // console.log(card.store)
-    // if (card.store === "MTGMate") {
-    //   setLogo(mtgmateLogo)
-    // } 
-    // else if (card.store === "Magic Hothub") {
-    //   setLogo(magicHothubLogo)
-    // }
     fetchCardFace();
   }, [card]);
 
@@ -57,7 +44,6 @@ function InfoPanel({ card }: InfoPanelProps): JSX.Element {
         <p>{priceString}</p>
       </div>
       <div className="flex flex-col gap-1 w-1/2">
-        {/* {logo && <Image src={logo} alt={card.store} width={130} height={50}/>} */}
         {card.store === "Magic Hothub" && <Image src="/assets/magichothub-logo.jpg" alt="Magic HotHub" width={130} height={50}/>}
         {card.store === "MTGMate" && <Image src="/assets/mtgmate-logo.png" alt="MtgMate" width={130} height={50}/>}
         {card.store === "Ronin Games" && <Image src="/assets/ronin-logo.png" alt="RoninGames" width={70} height={50}/>}
@@ -76,18 +62,17 @@ function InfoPanel({ card }: InfoPanelProps): JSX.Element {
 export default function Card() {
   const { cardname } = useParams<{ cardname: string | undefined }>();
   const [data, setData] = useState<CardDetails[]>([]);
-  const [flavor, setFlavor] = useState<string>("")
-  const [manaCost, setManaCost] = useState<string>("{}")
-
+  const [flavor, setFlavor] = useState<string>("");
+  const [manaCost, setManaCost] = useState<string>("{}");
+  const [isSearching, setIsSearching] = useState<boolean>(true);
   const decodedCardname = cardname ? decodeURIComponent(cardname) : undefined;
-  // const router = useRouter();
 
   useEffect(() => {
     const fetchData = async () => {
       if (typeof decodedCardname === 'string') {
         const result = await scrape(decodedCardname);
         setData(result);
-        // console.log(result)
+        setIsSearching(false);
       } else {
         console.error("cardname is not a string");
       }
@@ -130,8 +115,10 @@ export default function Card() {
         
         {flavor && <p className="w-2/3 text-center italic py-3">{flavor}</p>}
         <div className="flex items-center justify-center w-full">
-
           <div className="flex flex-wrap flex-row justify-center w-2/3 gap-4">
+          {isSearching && <LoadingWheel/>}
+          {(!isSearching && data.length === 0) && 
+          <p className="mt-20 italic text-gray-400">Looks like this card is playing hard to get. It's out of stock for now!</p>}
             {data.map((card: CardDetails, index) => (
               <InfoPanel key={index} card={card} />
             ))}
