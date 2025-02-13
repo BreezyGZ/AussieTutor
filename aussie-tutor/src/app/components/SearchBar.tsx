@@ -1,18 +1,12 @@
 "use client";
-// import axios from 'axios';
-// import fs from "fs/promises"
+
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from 'next/navigation';
 import { BACKEND_URL } from '@/app/backendConfig'
 
 async function getPartialMatches(partial: string) {
-  // const { data } = await axios.get("https://api.scryfall.com/catalog/card-names");
-  // const allCards = data.data.filter((s: string) => !s.startsWith('A-'));
   const response = await fetch(`${BACKEND_URL}/api/allCards`);
-  // console.log(response)
   const allCards = await response.json()
-  // console.log(allCards)
-
   const filteredCards = allCards.filter((card: string) =>
     card.toLowerCase().includes(partial.toLowerCase())
   );
@@ -23,7 +17,6 @@ async function getPartialMatches(partial: string) {
 
     if (a.toLowerCase() === partial.toLowerCase()) return -1;
     if (b.toLowerCase() === partial.toLowerCase()) return 1;
-
     if (aIndex !== bIndex) return aIndex - bIndex;
 
     return a.localeCompare(b);
@@ -32,10 +25,15 @@ async function getPartialMatches(partial: string) {
   return sortedCards;
 }
 
-export default function SearchBar() {
+interface SearchBarProps {
+  size: number;
+}
+
+export default function SearchBar({ size }: SearchBarProps) {
   const [search, setSearch] = useState<string>("");
   const [matches, setMatches] = useState<string[]>([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
+  const [selectedIndex, setSelectedIndex] = useState<number>(-1);
   const router = useRouter();
   const searchRef = useRef<HTMLDivElement>(null);
 
@@ -59,6 +57,7 @@ export default function SearchBar() {
     const handleClickOutside = (event: MouseEvent) => {
       if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
         setIsDropdownOpen(false);
+        setSelectedIndex(-1);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -67,36 +66,51 @@ export default function SearchBar() {
     };
   }, []);
 
+  // Handle keyboard events
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "ArrowDown") {
+      setSelectedIndex((prevIndex) =>
+        prevIndex < matches.length - 1 ? prevIndex + 1 : prevIndex
+      );
+    } else if (e.key === "ArrowUp") {
+      setSelectedIndex((prevIndex) =>
+        prevIndex > 0 ? prevIndex - 1 : prevIndex
+      );
+    } else if (e.key === "Enter" && selectedIndex !== -1) {
+      router.push(`/cards/${encodeURIComponent(matches[selectedIndex])}`);
+    }
+  };
+
   return (
-    <div ref={searchRef} className="w-1/6 flex flex-col gap-0 shadow-xl border">
+    <div ref={searchRef} className={`relative w-${size} flex flex-col gap-0 shadow-xl`}>
       <input
         className="px-2 py-1 border rounded"
         type="text"
-        placeholder="Find"
-        onChange={
-          (e) => {
-            setSearch(e.target.value)
-            setIsDropdownOpen(true)
-          }
-        }
+        placeholder="Search"
+        onChange={(e) => {
+          setSearch(e.target.value);
+          setIsDropdownOpen(true);
+          setSelectedIndex(-1);
+        }}
         value={search}
+        onKeyDown={handleKeyDown}
       />
       {isDropdownOpen && matches.length > 0 && (
-      <div className="absolute top-7 w-1/6 bg-white border shadow-xl">
-        {matches.slice(0, 10).map((item, index) => (
-          <div
-            key={index}
-            className="pl-2 hover:bg-gray-200 cursor-pointer"
-            onClick={() => {
-              router.push(`/cards/${encodeURIComponent(item)}`);
-              // console.log(encodeURIComponent(item))
-            }}
-          >
-            {item.length > 31 ? item.slice(0, 28) + '...' : item}
-          </div>
-        ))}
-      </div> 
-    )}
+        <div className="absolute mt-8 w-full bg-white border shadow-xl">
+          {matches.slice(0, 10).map((item, index) => (
+            <div
+              key={index}
+              className={`pl-2 hover:bg-gray-200 cursor-pointer ${selectedIndex === index ? 'bg-gray-300' : ''}`}
+              onClick={() => {
+                router.push(`/cards/${encodeURIComponent(item)}`);
+              }}
+              onMouseEnter={() => setSelectedIndex(index)}
+            >
+              {item.length > 31 ? item.slice(0, 28) + '...' : item}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
