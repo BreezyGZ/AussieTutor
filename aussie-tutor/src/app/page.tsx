@@ -2,8 +2,10 @@
 import axios from 'axios';
 import { useEffect, useState } from "react";
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import './globals.css'
 import './landing.css'
+import SearchBar from './components/SearchBar';
 
 async function getPartialMatches(partial: string) {
   const {data} = await axios.get("https://api.scryfall.com/catalog/card-names")
@@ -50,24 +52,34 @@ export default function Home() {
   }, [search]);
 
   return (
-    <div className="main">
-      <div className="main-wrapper">
+    <div className="flex flex-col items-center gap-20 pb-20 mt-10 justify-between h-screen">
+      <div className="flex flex-col gap-8 items-center p-10">
         <h1>AussieTutor</h1>
-        <div className="search-bar">
-          <input
-            type="text"
-            placeholder="Find"
-            onChange={(e)=>setSearch(e.target.value)}
-          >
-          </input>
-          <div className="matchlist">
-            {matches.slice(0, 10).map((item, index) => (
-              <div key={index} className="match" onClick={() => {router.push(`/cards/${item}`)}}>
-                {item.length > 31 ? item.slice(0, 28) + '...' : item }
-              </div>
-            ))}
-          </div>  
-        </div>
+        <SearchBar size={96}/>
+        <p className="text-center">
+        Search for any card and instantly compare prices across multiple Australian vendors. <br/>
+        Get the best price and save on your collection!
+        </p>
+      </div>
+      <div className="flex">
+        <Image
+          src= "/assets/apac_rabbit.jpg"
+          alt="APAC Rabbit"
+          width={650}
+          height={400}
+        />
+        <Image
+          src= "/assets/apac_dragon.png"
+          alt="APAC Dragon"
+          width={580}
+          height={400}
+        />
+        <Image
+          src= "/assets/apac_snake.jpg"
+          alt="APAC Snake"
+          width={700}
+          height={400}
+        />
       </div>
     </div>
   )

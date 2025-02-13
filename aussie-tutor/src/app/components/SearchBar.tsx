@@ -32,7 +32,11 @@ async function getPartialMatches(partial: string) {
   return sortedCards;
 }
 
-export default function SearchBar() {
+interface SearchBarProps {
+  size: number;
+}
+
+export default function SearchBar({ size }: SearchBarProps) {
   const [search, setSearch] = useState<string>("");
   const [matches, setMatches] = useState<string[]>([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
@@ -68,11 +72,11 @@ export default function SearchBar() {
   }, []);
 
   return (
-    <div ref={searchRef} className="w-1/6 flex flex-col gap-0 shadow-xl border">
+    <div ref={searchRef} className={`relative w-${size} flex flex-col gap-0 shadow-xl`}>
       <input
         className="px-2 py-1 border rounded"
         type="text"
-        placeholder="Find"
+        placeholder="Search"
         onChange={
           (e) => {
             setSearch(e.target.value)
@@ -82,7 +86,7 @@ export default function SearchBar() {
         value={search}
       />
       {isDropdownOpen && matches.length > 0 && (
-      <div className="absolute top-7 w-1/6 bg-white border shadow-xl">
+      <div className="absolute mt-8 w-full bg-white border shadow-xl">
         {matches.slice(0, 10).map((item, index) => (
           <div
             key={index}
