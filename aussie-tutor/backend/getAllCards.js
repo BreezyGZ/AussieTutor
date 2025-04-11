@@ -27,7 +27,7 @@ export default async function getAllCards() {
     await updateCardNames();
   }
 
-  const fileContent = await fs.promises.readFile('./allCards.txt', 'utf8');
+  const fileContent = await fs.promises.readFile(CARD_FILE_PATH, 'utf8');
   const cardNames = JSON.parse(fileContent);
   return(cardNames);
 }

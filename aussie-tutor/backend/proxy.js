@@ -92,8 +92,7 @@ app.get('/api/magiccards', async (req, res, next) => {
         index++;
       
     } catch (error) {
-      console.error(error);
-      break;
+      console.error("hothub" + error);
     }
   }
   allCards = removeDuplicateCards(allCards);
@@ -182,9 +181,13 @@ app.get('/api/gamesportal', async (req, res, next) => {
       res.json(allCards);
     }
     catch (error) {
-      console.error(error)
+      console.error("gamesportal" + error)
     }
 });
+
+// app.get('/api/gamesportal', async (req, res, next) => {
+
+// })
 
 app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Internal Server Error' });

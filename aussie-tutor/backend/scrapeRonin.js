@@ -100,7 +100,7 @@ export default async function scrapeRonin(cardURI) {
     return(allCards)
   }
   catch (error) {
-    console.error(error)
+    console.error("ronin" + error)
   }
 }
 

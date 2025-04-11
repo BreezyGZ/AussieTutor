@@ -76,7 +76,11 @@ export default async function scrapeGoodGames(cardURI) {
     try {
         const { data } = await axios.get(`${URL}/search?q=${cardURI}&f_Availability=Exclude Out Of Stock`, {
             headers: {
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
+                "Accept-Language": "en-US,en;q=0.9",
+                "Accept": "text/html,application/xhtml+xml",
+                "Referer": `${URL}`,    
+                "Connection": "keep-alive",
             }
         });
         
@@ -96,7 +100,7 @@ export default async function scrapeGoodGames(cardURI) {
         return(cards)
 
     } catch (error) {
-        console.error(error)
+        console.error("goodgames" + error)
     }
 }
 
