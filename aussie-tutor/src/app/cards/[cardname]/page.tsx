@@ -81,7 +81,7 @@ export default function Card() {
     const decorate = async() => {
       try {
         const {data} = await axios.get(`https://api.scryfall.com/cards/search?q=!"${decodedCardname}"&unique=prints`)
-        console.log(data)
+        // console.log(data)
 
         if (!data.data) {
           return

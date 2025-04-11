@@ -60,7 +60,7 @@ async function scrapeMtgMate(cardURI: string): Promise<CardDetails[]> {
     return cleanData;
   } 
   catch (error) {
-    console.error(error);
+    console.error("scrapeMtgMate" + error);
     return [];
   }
 }
@@ -86,23 +86,39 @@ async function scrapeMtgMate(cardURI: string): Promise<CardDetails[]> {
 //   });
 // }
 
-export default async function scrape(card: string): Promise<CardDetails[]> {
+const safeJson = async (res: Response): Promise<any[]> => {
+  if (!res.ok) return [];
   try {
-    const [hothub_res, gamesportal_res, goodgames_res, ronin_res, mate] = await Promise.all([
+    const text = await res.text();
+    if (!text) return [];
+    return JSON.parse(text);
+  } catch (e) {
+    console.error("Failed to parse JSON:", e);
+    return [];
+  }
+};
+
+export default async function scrape(card: string): Promise<CardDetails[]> {
+  console.log(card)
+  try {
+    const [hothub_res, gamesportal_res, goodgames_res, ronin_res, mate_res] = await Promise.allSettled([
       fetch(`${BACKEND_URL}/api/magiccards?card=${encodeURIComponent(card)}`),
       fetch(`${BACKEND_URL}/api/gamesportal?card=${encodeURIComponent(card)}`),
       fetch(`${BACKEND_URL}/api/goodgames?card=${encodeURIComponent(card)}`),
       fetch(`${BACKEND_URL}/api/ronin?card=${encodeURIComponent(card)}`),
       scrapeMtgMate(card),
     ]);
-    const hothub = hothub_res.ok ? await hothub_res.json() : [];
-    const ronin = ronin_res.ok ? await ronin_res.json() : [];
-    const goodgames = goodgames_res.ok ? await goodgames_res.json() : [];
-    const gamesportal = gamesportal_res.ok ? await gamesportal_res.json() : [];
+    const hothub = hothub_res.status === "fulfilled" ? await safeJson(hothub_res.value) : [];
+    const gamesportal = gamesportal_res.status === "fulfilled" ? await safeJson(gamesportal_res.value) : [];
+    const goodgames = goodgames_res.status === "fulfilled" ? await safeJson(goodgames_res.value) : [];
+    const ronin = ronin_res.status === "fulfilled" ? await safeJson(ronin_res.value) : [];
+    const mate = mate_res.status === "fulfilled" ? mate_res.value : [];
+
     const allCards = [...hothub, ...gamesportal, ...mate, ...goodgames, ...ronin];
-    // console.log(allCards)s
+    console.log(allCards)
     return allCards.sort((a, b) => a.price - b.price);
-  } catch (error) {
+  } 
+  catch (error) {
     console.error("Error scraping card data:", error);
     return [];
   }
