@@ -10,6 +10,7 @@ import axios from "axios";
 import '@/app/globals.css';
 import ManaCost from "@/app/components/ManaCost";
 import LoadingWheel from "@/app/components/LoadingWheel";
+import FilterBar from "@/app/components/FilterBar";
 
 function InfoPanel({ card }: InfoPanelProps): JSX.Element {
   const [face, setFace] = useState<string>("")
@@ -61,17 +62,20 @@ function InfoPanel({ card }: InfoPanelProps): JSX.Element {
 
 export default function Card() {
   const { cardname } = useParams<{ cardname: string | undefined }>();
-  const [data, setData] = useState<CardDetails[]>([]);
+  const [priceData, setPriceData] = useState<CardDetails[]>([]);
+  const [filteredPriceData, setFilteredPriceData] = useState<CardDetails[]>([]);
   const [flavor, setFlavor] = useState<string>("");
   const [manaCost, setManaCost] = useState<string>("{}");
   const [isSearching, setIsSearching] = useState<boolean>(true);
   const decodedCardname = cardname ? decodeURIComponent(cardname) : undefined;
 
+
   useEffect(() => {
     const fetchData = async () => {
       if (typeof decodedCardname === 'string') {
         const result = await scrape(decodedCardname);
-        setData(result);
+        setPriceData(result);
+        setFilteredPriceData(result);
         setIsSearching(false);
       } else {
         console.error("cardname is not a string");
@@ -84,7 +88,7 @@ export default function Card() {
         // console.log(data)
 
         if (!data.data) {
-          return
+          return;
         }
         if (data.data[0].mana_cost) {
           setManaCost(data.data[0].mana_cost)
@@ -107,6 +111,7 @@ export default function Card() {
 
   return (
     <div className="flex justify-center">
+      <FilterBar priceData={priceData}/>
       <div className="flex flex-col items-center w-full">
         <div className="flex items-center space-x-8 pt-5 px-10">
           <h1 className="font-beleren">{decodedCardname && decodeURIComponent(decodedCardname)}</h1>
@@ -117,9 +122,9 @@ export default function Card() {
         <div className="flex items-center justify-center w-full">
           <div className="flex flex-wrap flex-row justify-center w-2/3 gap-4">
           {isSearching && <LoadingWheel/>}
-          {(!isSearching && data.length === 0) && 
+          {(!isSearching && filteredPriceData.length === 0) && 
           <p className="mt-20 italic text-gray-400">Looks like this card is playing hard to get. It's out of stock for now!</p>}
-            {data.map((card: CardDetails, index) => (
+            {filteredPriceData.map((card: CardDetails, index) => (
               <InfoPanel key={index} card={card} />
             ))}
           </div>
