@@ -62,14 +62,51 @@ function InfoPanel({ card }: InfoPanelProps): JSX.Element {
 
 export default function Card() {
   const { cardname } = useParams<{ cardname: string | undefined }>();
-  const [priceData, setPriceData] = useState<CardDetails[]>([]);
-  const [filteredPriceData, setFilteredPriceData] = useState<CardDetails[]>([]);
   const [flavor, setFlavor] = useState<string>("");
   const [manaCost, setManaCost] = useState<string>("{}");
   const [isSearching, setIsSearching] = useState<boolean>(true);
   const decodedCardname = cardname ? decodeURIComponent(cardname) : undefined;
 
+  const [priceData, setPriceData] = useState<CardDetails[]>([]);
+  const [filteredPriceData, setFilteredPriceData] = useState<CardDetails[]>([]);
+  
+  const [selectedSets, setSelectedSets] = useState<string[]>([])
+  const [selectedFinishs, setSelectedFinishs] = useState<string[]>([])
+  const [selectedStores, setSelectedStores] = useState<string[]>([])
+  const [selectedConditions, setSelectedConditions] = useState<string[]>([])
 
+  // const handleSetChange = (selected: string[]) => {
+  //   setSelectedSets(selected)
+  // }
+  useEffect(() => {
+    let updated = priceData
+    if (selectedSets.length > 0) {
+      updated = updated.filter((details) => selectedSets.includes(details.set))
+    }
+    if (selectedFinishs.length > 0) {
+      updated = updated.filter((details) => selectedFinishs.includes(details.finish))
+    }
+    if (selectedStores.length > 0) {
+      updated = updated.filter((details) => selectedStores.includes(details.store))
+    }
+    if (selectedConditions.length > 0) {
+      updated = updated.filter((details) => selectedConditions.includes(details.condition))
+    }
+    setFilteredPriceData(updated)
+
+  }, [selectedSets, selectedFinishs, selectedStores, selectedConditions, priceData])
+  
+  // useEffect(() => {
+  //   if (selectedFinishs.length !== 0) {
+  //     const updated = priceData.filter((details) => selectedFinishs.includes(details.finish))
+  //     console.log(updated)
+  //     setFilteredPriceData(updated)
+  //   }
+  //   else {
+  //     setFilteredPriceData(priceData)
+  //   }
+  // }, [selectedSets, selectedFinishs])
+  
   useEffect(() => {
     const fetchData = async () => {
       if (typeof decodedCardname === 'string') {
@@ -111,7 +148,13 @@ export default function Card() {
 
   return (
     <div className="flex justify-center">
-      <FilterBar priceData={priceData}/>
+      <FilterBar 
+        priceData={priceData} 
+        setSets={setSelectedSets} 
+        setFinishs={setSelectedFinishs} 
+        setStores={setSelectedStores} 
+        setConditions={setSelectedConditions}
+      />
       <div className="flex flex-col items-center w-full">
         <div className="flex items-center space-x-8 pt-5 px-10">
           <h1 className="font-beleren">{decodedCardname && decodeURIComponent(decodedCardname)}</h1>
