@@ -48,14 +48,65 @@ export default function FilterBar({priceData, setSets, setFinishs, setStores, se
   }
 
   return (
-    <div className="flex flex-col w-1/3 border-[2px] border-black bg-white p-4 rounded-md space-y-2">
-      <div className="text-lg font-semibold">
+    <div className="flex flex-col w-80 h-auto bg-at-white space-y-2 shadow-sm">
+      <div className="flex justify-between bg-at-green items-center text-base font-semibold text-gray-700 p-2">
         Filter by:
-        <button onClick={() => handleCollapseAll()}>
+        <button
+          className="text-sm text-blue-600 hover:underline" 
+          onClick={() => handleCollapseAll()}
+        >
           {isCollapsed.every(elem => elem === false) ? "Collapse All" : "Expand All"}
         </button>
       </div>
-      <div className="border-[2px] border-black rounded-md text-sm" onClick={() => handleCollapse(0)}>
+
+      {[
+    { label: "Set", data: sets, selected: selectedSets, setSelected: setSelectedSets, setData: setSets },
+    { label: "Finish", data: finishs, selected: selectedFinishs, setSelected: setSelectedFinishs, setData: setFinishs },
+    { label: "Store", data: stores, selected: selectedStores, setSelected: setSelectedStores, setData: setStores },
+    { label: "Condition", data: conditions, selected: selectedConditions, setSelected: setSelectedConditions, setData: setConditions },
+  ].map(({ label, data, selected, setSelected, setData }, i) => (
+    <div
+      key={label}
+      className="border border-gray-300 rounded-lg bg-at-yellow text-sm p-3 transition-all"
+    >
+      <div
+        className="flex justify-between items-center cursor-pointer select-none"
+        onClick={() => handleCollapse(i)}
+      >
+        <span className="font-medium text-gray-800">{label}</span>
+        <button>
+          {isCollapsed[i] ? (
+            <FaChevronDown className="text-gray-500" />
+          ) : (
+            <FaChevronUp className="text-gray-500" />
+          )}
+        </button>
+      </div>
+
+      {!isCollapsed[i] && (
+        <div className="mt-2 space-y-2 pr-1">
+          {[...data].sort().map((item: string) => (
+            <label key={item} className="flex items-center gap-2 text-gray-700">
+              <input
+                type="checkbox"
+                className="accent-blue-600"
+                checked={selected.includes(item)}
+                onChange={() => {
+                  const updated = selected.includes(item)
+                    ? selected.filter((s) => s !== item)
+                    : [...selected, item];
+                  setSelected(updated);
+                  setData(updated);
+                }}
+              />
+              {item}
+            </label>
+          ))}
+        </div>
+      )}
+    </div>
+  ))}
+      {/* <div className="border-[2px] border-black rounded-md text-sm" onClick={() => handleCollapse(0)}>
         Set:
         <button onClick={() => handleCollapse(0)}>{isCollapsed[0] ? <FaChevronDown/> : <FaChevronUp/>} </button>
         {!isCollapsed[0] && [... sets].sort().map((set: string) => (
@@ -142,7 +193,7 @@ export default function FilterBar({priceData, setSets, setFinishs, setStores, se
             />
           </label>
         ))}
-      </div>
+      </div> */}
     </div>
   )
 }

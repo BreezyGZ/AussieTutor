@@ -139,7 +139,7 @@ export default function Card() {
           }
         }
       } catch (error) {
-        console.log(error)
+        console.log("flavor scryfall fail" + error)
       }
     }
     fetchData();
