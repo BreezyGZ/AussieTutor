@@ -5,40 +5,22 @@ import './landing.css'
 import SearchBar from './components/SearchBar';
 
 export default function Home() {
+  // flex flex-col items-center justify-between 
   return (
-    <div className="flex flex-col items-center gap-20 pb-20 mt-10 justify-between min-h-screen">
-      <div className="flex flex-col gap-8 items-center p-10">
-        <h1>AussieTutor</h1>
-        <SearchBar size={96} />
-        <p className="text-center">
-          Search for any card and instantly compare prices across multiple Australian vendors. <br />
-          Get the best price and save on your collection!
+    <div 
+      className="gap-20 pb-20 min-h-screen bg-landing bg-cover bg-center "
+    >
+      <div className="absolute inset-0 bg-at-red bg-opacity-60 z-0" />
+      <div className="flex flex-col gap-4 items-center p-10 pt-40">
+        <h1 className='font-inlander tracking-[0.25em] text-4xl md:text-5xl lg:text-6xl text-white z-10'>aussietutor</h1>
+        <p className="text-center z-10 text-xl text-white pb-5">
+          A one-stop site to find the best deals in Australia!
         </p>
+        <SearchBar size="w-full sm:w-2/3 lg:w-1/3" text="Type any card name..."/>
+        
       </div>
+      
   
-      <div className="absolute bottom-0 left-0 w-full flex h-[40vh]">
-        <Image
-          src="/assets/apac_rabbit.jpg"
-          alt="APAC Rabbit"
-          width={650}
-          height={300}
-          className="w-1/3 h-auto object-cover"
-        />
-        <Image
-          src="/assets/apac_dragon.png"
-          alt="APAC Dragon"
-          width={680}
-          height={300}
-          className="w-1/3 h-auto object-cover"
-        />
-        <Image
-          src="/assets/apac_snake.jpg"
-          alt="APAC Snake"
-          width={600}
-          height={300}
-          className="w-1/3 h-auto object-cover"
-        />
-      </div>
     </div>
   );
   
