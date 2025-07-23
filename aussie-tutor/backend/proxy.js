@@ -32,7 +32,7 @@ app.get('/api/magiccards', async (req, res, next) => {
       return;
     }
     const baseUrl = `${MAGICHOTHUB_URL}/search/product?search_api_views_fulltext=${encodeURIComponent(card)}`;
-    // console.log(`Received request for card: ${req.query.card}`);
+    console.log(`Received request for card: ${card}`);
     // console.log(`Fetching URL: ${targetUrl}`);
 
     let targetUrl = null
@@ -44,12 +44,9 @@ app.get('/api/magiccards', async (req, res, next) => {
       } else {
         targetUrl = `${baseUrl}&page=${index.toString()}`;
       }
-      // console.log("loop")
       try {
         // console.log(`Fetching URL: ${targetUrl}`);
-
         const { data } = await axios.get(targetUrl);
-        // console.log(data)
         const $ = cheerio.load(data);
         const cards = [];
 
@@ -60,6 +57,7 @@ app.get('/api/magiccards', async (req, res, next) => {
           const stock = parseInt($(elem).closest('.group-descript').find('.commerce-product-field-commerce-stock .field-item').text().trim());
           const match = name.match(/^\((.*?)\)\s*(.+)$/);
           let cardname = name;
+          
           let details = null;
           if (match) {
             cardname = match[2].trim();
@@ -77,6 +75,7 @@ app.get('/api/magiccards', async (req, res, next) => {
           if (cardname.toLowerCase() !== card.toLowerCase()) {
             return;
           }
+          console.log(cardname)
           cards.push({
             store: "Magic Hothub",
             cardname,
@@ -90,7 +89,7 @@ app.get('/api/magiccards', async (req, res, next) => {
             link: `${MAGICHOTHUB_URL}${link}`,
           });
         });
-        // console.log(cards)
+        console.log(cards)
 
         if (cards.length === 0) {
           break;
@@ -105,6 +104,7 @@ app.get('/api/magiccards', async (req, res, next) => {
     }
   }
   allCards = removeDuplicateCards(allCards);
+  console.log(allCards)
   res.json(allCards);
 });
 

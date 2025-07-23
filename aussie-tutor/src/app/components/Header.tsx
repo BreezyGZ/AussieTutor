@@ -14,7 +14,7 @@ export default function Header() {
 
   return (
     // <div className="flex justify-between h-16 bg-at-red items-center p-4">
-    <div className="fixed top-0 left-0 w-full z-50 flex justify-between h-16 items-center p-4 sm:p-10 lg:p-10">
+    <div className="absolute top-0 left-0 w-full z-50 flex justify-between h-16 items-center p-4 sm:p-10 lg:p-10">
       <div
         className={`tracking-[0.05em] hover:cursor-pointer flex gap-10 font-inlander text-xl ${textColor}`}
       >

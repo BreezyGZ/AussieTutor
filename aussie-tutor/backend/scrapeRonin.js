@@ -75,7 +75,7 @@ export default async function scrapeRonin(cardURI) {
           continue
         }
         if (title.cardname !== cardname) {
-          console.log(title)
+          // console.log(title)
           continue;
         }
         for (const variant of parsedData.variants) {
