@@ -75,6 +75,8 @@ export default function Card() {
   const [selectedStores, setSelectedStores] = useState<string[]>([])
   const [selectedConditions, setSelectedConditions] = useState<string[]>([])
 
+  const [isFilterOpen, setIsFilterOpen] = useState<boolean>(false)
+
   // const handleSetChange = (selected: string[]) => {
   //   setSelectedSets(selected)
   // }
@@ -148,13 +150,13 @@ export default function Card() {
 
   return (
     <div className="flex justify-center">
-      <FilterBar 
+      {isFilterOpen && <FilterBar 
         priceData={priceData} 
         setSets={setSelectedSets} 
         setFinishs={setSelectedFinishs} 
         setStores={setSelectedStores} 
         setConditions={setSelectedConditions}
-      />
+      />}
       <div className="flex flex-col items-center w-full">
         <div className="flex items-center space-x-8 pt-5 px-10">
           <h1 className="font-beleren">{decodedCardname && decodeURIComponent(decodedCardname)}</h1>
@@ -162,6 +164,10 @@ export default function Card() {
         </div>
         
         {flavor && <p className="w-2/3 text-center italic py-3">{flavor}</p>}
+        <button onClick={() => {setIsFilterOpen(!isFilterOpen)}}>
+          Filters
+        </button>
+        
         <div className="flex items-center justify-center w-full">
           <div className="flex flex-wrap flex-row justify-center w-2/3 gap-4">
           {isSearching && <LoadingWheel/>}
