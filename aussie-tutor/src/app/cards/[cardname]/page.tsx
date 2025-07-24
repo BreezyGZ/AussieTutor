@@ -11,6 +11,7 @@ import '@/app/globals.css';
 import ManaCost from "@/app/components/ManaCost";
 import LoadingWheel from "@/app/components/LoadingWheel";
 import FilterBar from "@/app/components/FilterBar";
+import { HiAdjustmentsHorizontal } from "react-icons/hi2";
 
 function InfoPanel({ card }: InfoPanelProps): JSX.Element {
   const [face, setFace] = useState<string>("")
@@ -76,12 +77,14 @@ export default function Card() {
   const [selectedConditions, setSelectedConditions] = useState<string[]>([])
 
   const [isFilterOpen, setIsFilterOpen] = useState<boolean>(false)
+  const [isPriceAsc, setIsPriceAsc] = useState<boolean>(true)
 
   // const handleSetChange = (selected: string[]) => {
   //   setSelectedSets(selected)
   // }
+
   useEffect(() => {
-    let updated = priceData
+    let updated = [...priceData]
     if (selectedSets.length > 0) {
       updated = updated.filter((details) => selectedSets.includes(details.set))
     }
@@ -94,20 +97,13 @@ export default function Card() {
     if (selectedConditions.length > 0) {
       updated = updated.filter((details) => selectedConditions.includes(details.condition))
     }
+
+    if (!isPriceAsc) {
+      updated.reverse();
+    }
     setFilteredPriceData(updated)
 
-  }, [selectedSets, selectedFinishs, selectedStores, selectedConditions, priceData])
-  
-  // useEffect(() => {
-  //   if (selectedFinishs.length !== 0) {
-  //     const updated = priceData.filter((details) => selectedFinishs.includes(details.finish))
-  //     console.log(updated)
-  //     setFilteredPriceData(updated)
-  //   }
-  //   else {
-  //     setFilteredPriceData(priceData)
-  //   }
-  // }, [selectedSets, selectedFinishs])
+  }, [selectedSets, selectedFinishs, selectedStores, selectedConditions, priceData, isPriceAsc])
   
   useEffect(() => {
     const fetchData = async () => {
@@ -124,8 +120,6 @@ export default function Card() {
     const decorate = async() => {
       try {
         const {data} = await axios.get(`https://api.scryfall.com/cards/search?q=!"${decodedCardname}"&unique=prints`)
-        // console.log(data)
-
         if (!data.data) {
           return;
         }
@@ -134,7 +128,6 @@ export default function Card() {
         }
         
         for (const card of data.data) {
-          // console.log(card)
           if (card.flavor_text) {
             setFlavor(`${card.flavor_text}`);
             break;
@@ -149,8 +142,9 @@ export default function Card() {
   }, [cardname]);
 
   return (
-    <div className="flex justify-center">
-      {isFilterOpen && <FilterBar 
+    <div className="flex justify-center pt-16">
+      {isFilterOpen && <FilterBar
+        setIsFilterOpen={setIsFilterOpen}
         priceData={priceData} 
         setSets={setSelectedSets} 
         setFinishs={setSelectedFinishs} 
@@ -164,9 +158,22 @@ export default function Card() {
         </div>
         
         {flavor && <p className="w-2/3 text-center italic py-3">{flavor}</p>}
-        <button onClick={() => {setIsFilterOpen(!isFilterOpen)}}>
-          Filters
-        </button>
+        <div className="flex justify-between w-1/2 mb-3">
+          <button
+            className="flex items-center justify-center gap-2 px-4 py-2 bg-white text-gray-800 hover:bg-gray-200 rounded-2xl shadow-md transition duration-200"
+            onClick={() => {setIsPriceAsc(!isPriceAsc)}}
+          >
+            Price: {isPriceAsc ? " Low-High": " High-Low"}
+          </button>
+          <button
+            className="flex items-center justify-center gap-2 px-4 py-2 bg-white text-gray-800 hover:bg-gray-200 rounded-2xl shadow-md transition duration-200"
+            onClick={() => setIsFilterOpen(!isFilterOpen)}
+          >
+            <span>Filters</span>
+            <HiAdjustmentsHorizontal className="w-5 h-5" />
+          </button>
+        </div>
+        
         
         <div className="flex items-center justify-center w-full">
           <div className="flex flex-wrap flex-row justify-center w-2/3 gap-4">

@@ -62,7 +62,7 @@ app.get('/api/magiccards', async (req, res, next) => {
           }
 
           const price = $(elem).find('.price-amount').text().trim().slice(1);
-          const finish = $(elem).closest('.group-descript').find('.commerce-product-field-field-foil .field-item').text().trim();
+          let finish = $(elem).closest('.group-descript').find('.commerce-product-field-field-foil .field-item').text().trim();
           const set = $(elem).closest('.group-descript').find('.commerce-product-field-field-set li').text().trim();
           const condition = $(elem).closest('.group-descript').find('.commerce-product-field-field-condition li').text().trim();
 
@@ -71,6 +71,9 @@ app.get('/api/magiccards', async (req, res, next) => {
           // }
           if (cardname.toLowerCase() !== card.toLowerCase()) {
             return;
+          }
+          if (finish === "Non Foil") {
+            finish = "Nonfoil"
           }
           cards.push({
             store: "Magic Hothub",

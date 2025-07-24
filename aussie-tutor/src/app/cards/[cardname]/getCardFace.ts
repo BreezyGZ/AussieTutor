@@ -18,7 +18,7 @@ async function fetchSetNameToCodeMap(): Promise<Record<string, string>> {
 
   const url = "https://api.scryfall.com/sets";
   try {
-    console.log("Fetching from API...");
+    // console.log("Fetching from API...");
     const response = await axios.get(url);
     const setsData: MTGSet[] = response.data.data;
 
@@ -78,9 +78,15 @@ export default async function getCardFace(card: CardDetails) {
       extraSearchParams += "+is%3Aborderless"
     }
   }
-  const { data } = await axios.get(`https://api.scryfall.com/cards/search?q=!${card.cardname}+set%3A${setCode}${extraSearchParams}`);
-  const face = data.data[0].image_uris.border_crop;
-  return face
+  try {
+    const { data } = await axios.get(`https://api.scryfall.com/cards/search?q=!"${card.cardname}"+set%3A${setCode}${extraSearchParams}`);
+    const face = data.data[0].image_uris.border_crop;
+    return face
+  }
+  catch (error) {
+    console.error(`https://api.scryfall.com/cards/search?q=!"${card.cardname}"+set%3A${setCode}${extraSearchParams}`)
+    return "/assets/damaged_mtg_back.png"
+  }
 }
 
 // // Example Usage
