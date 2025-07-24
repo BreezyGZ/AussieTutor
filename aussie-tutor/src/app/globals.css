@@ -17,7 +17,7 @@
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: MPlantin;
+  font-family: "Work-Sans", sans-serif;
 }
 
 h1 {
@@ -92,6 +92,20 @@ h2 {
   src: url('/fonts/mplantin/Mplantin.woff') format('woff'), 
        url('/fonts/mplantin/Mplantin.ttf') format('truetype'), 
        url('/fonts/mplantin/Mplantin.svg') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Inlander-Smooth';
+  src: url('/fonts/inlander/Inlander Smooth.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Work-Sans';
+  src: url('/fonts/Work-Sans/WorkSans-Regular.otf') format('opentype');
   font-weight: normal;
   font-style: normal;
 }

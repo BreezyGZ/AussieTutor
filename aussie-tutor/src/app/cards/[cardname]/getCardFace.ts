@@ -78,7 +78,7 @@ export default async function getCardFace(card: CardDetails) {
       extraSearchParams += "+is%3Aborderless"
     }
   }
-  const { data } = await axios.get(`https://api.scryfall.com/cards/search?q=${card.cardname}+set%3A${setCode}${extraSearchParams}`);
+  const { data } = await axios.get(`https://api.scryfall.com/cards/search?q=!${card.cardname}+set%3A${setCode}${extraSearchParams}`);
   const face = data.data[0].image_uris.border_crop;
   return face
 }

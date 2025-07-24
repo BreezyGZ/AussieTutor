@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from 'next/navigation';
 import { BACKEND_URL } from '@/app/backendConfig'
+import { FaSearch } from "react-icons/fa";
 
 async function getPartialMatches(partial: string) {
   const response = await fetch(`${BACKEND_URL}/api/allCards`);
@@ -26,10 +27,11 @@ async function getPartialMatches(partial: string) {
 }
 
 interface SearchBarProps {
-  size: number;
+  size: string;
+  text: string;
 }
 
-export default function SearchBar({ size }: SearchBarProps) {
+export default function SearchBar({ size, text }: SearchBarProps) {
   const [search, setSearch] = useState<string>("");
   const [matches, setMatches] = useState<string[]>([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
@@ -82,11 +84,11 @@ export default function SearchBar({ size }: SearchBarProps) {
   };
 
   return (
-    <div ref={searchRef} className={`relative w-${size} flex flex-col gap-0 shadow-xl`}>
+    <div ref={searchRef} className={`relative ${size} flex flex-col gap-0 z-10`}>
       <input
-        className="px-2 py-1 border rounded"
+        className="px-4 py-2 text-lg rounded-2xl z-20"
         type="text"
-        placeholder="Search"
+        placeholder={text}
         onChange={(e) => {
           setSearch(e.target.value);
           setIsDropdownOpen(true);
@@ -95,12 +97,15 @@ export default function SearchBar({ size }: SearchBarProps) {
         value={search}
         onKeyDown={handleKeyDown}
       />
+      <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-gray-500 z-20">
+        <FaSearch />
+      </div>
       {isDropdownOpen && matches.length > 0 && (
-        <div className="absolute mt-8 w-full bg-white border shadow-xl">
+        <div className="absolute mt-4 pt-7 w-full bg-white border z-1 rounded-2xl">
           {matches.slice(0, 10).map((item, index) => (
             <div
               key={index}
-              className={`pl-2 hover:bg-gray-200 cursor-pointer ${selectedIndex === index ? 'bg-gray-300' : ''}`}
+              className={`p-1 pl-3 hover:bg-gray-200 cursor-pointer ${selectedIndex === index ? 'bg-gray-300' : ''} rounded-xl`}
               onClick={() => {
                 router.push(`/cards/${encodeURIComponent(item)}`);
               }}

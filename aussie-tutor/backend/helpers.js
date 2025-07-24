@@ -30,7 +30,7 @@ export function parseCardString(cardString) {
   const conditions = ["Damaged", "Near Mint", "Lightly Played", "Moderately Played", "Heavily Played"];
 
   if (!match) {
-    console.log(cardString)
+    // console.log(cardString)
     throw new Error("Invalid string format");
   }
 
