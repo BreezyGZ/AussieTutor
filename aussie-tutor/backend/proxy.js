@@ -32,7 +32,7 @@ app.get('/api/magiccards', async (req, res, next) => {
       return;
     }
     const baseUrl = `${MAGICHOTHUB_URL}/search/product?search_api_views_fulltext=${encodeURIComponent(card)}`;
-    console.log(`Received request for card: ${card}`);
+    // console.log(`Received request for card: ${card}`);
     // console.log(`Fetching URL: ${targetUrl}`);
 
     let targetUrl = null
@@ -75,7 +75,6 @@ app.get('/api/magiccards', async (req, res, next) => {
           if (cardname.toLowerCase() !== card.toLowerCase()) {
             return;
           }
-          console.log(cardname)
           cards.push({
             store: "Magic Hothub",
             cardname,
@@ -89,7 +88,6 @@ app.get('/api/magiccards', async (req, res, next) => {
             link: `${MAGICHOTHUB_URL}${link}`,
           });
         });
-        console.log(cards)
 
         if (cards.length === 0) {
           break;
@@ -104,7 +102,6 @@ app.get('/api/magiccards', async (req, res, next) => {
     }
   }
   allCards = removeDuplicateCards(allCards);
-  console.log(allCards)
   res.json(allCards);
 });
 
@@ -116,7 +113,6 @@ app.get('/api/ronin', async (req, res, next) => {
   }
   const data = await scrapeRonin(card)
   res.json(data)
-  // console.log(data)
 });
 
 
@@ -129,7 +125,6 @@ app.get('/api/goodgames', async (req, res, next) => {
   }
   const data = await scrapeGoodGames(card) 
   res.json(data)
-  // console.log(data)
 });
 
 app.get('/api/gamesportal', async (req, res, next) => {
