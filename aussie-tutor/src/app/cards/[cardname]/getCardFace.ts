@@ -84,7 +84,8 @@ export default async function getCardFace(card: CardDetails) {
     return face
   }
   catch (error) {
-    console.error(`https://api.scryfall.com/cards/search?q=!"${card.cardname}"+set%3A${setCode}${extraSearchParams}`)
+    // console.log(setCode)
+    // console.log(`https://api.scryfall.com/cards/search?q=!"${card.cardname}"+set%3A${setCode}${extraSearchParams}`)
     return "/assets/damaged_mtg_back.png"
   }
 }

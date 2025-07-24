@@ -142,7 +142,7 @@ export default function Card() {
   }, [cardname]);
 
   return (
-    <div className="flex justify-center pt-16">
+    <div className="flex justify-center pt-16 xl:pt-0">
       {isFilterOpen && <FilterBar
         setIsFilterOpen={setIsFilterOpen}
         priceData={priceData} 
@@ -152,13 +152,13 @@ export default function Card() {
         setConditions={setSelectedConditions}
       />}
       <div className="flex flex-col items-center w-full">
-        <div className="flex items-center space-x-8 pt-5 px-10">
+        <div className="flex items-center space-x-8 pt-5 px-10 break-all">
           <h1 className="font-beleren">{decodedCardname && decodeURIComponent(decodedCardname)}</h1>
           <ManaCost manaCost={manaCost}/>
         </div>
         
         {flavor && <p className="w-2/3 text-center italic py-3">{flavor}</p>}
-        <div className="flex justify-between w-1/2 mb-3">
+        <div className="flex justify-between mb-3 px-10 w-full sm:w-2/3 lg:w-1/2">
           <button
             className="flex items-center justify-center gap-2 px-4 py-2 bg-white text-gray-800 hover:bg-gray-200 rounded-2xl shadow-md transition duration-200"
             onClick={() => {setIsPriceAsc(!isPriceAsc)}}

@@ -26,6 +26,34 @@ async function getPartialMatches(partial: string) {
   return sortedCards;
 }
 
+function ResponsiveTruncatedText({ text }: { text: string }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [maxChars, setMaxChars] = useState(28);
+
+  useEffect(() => {
+    function updateMaxChars() {
+      if (!containerRef.current) return;
+      const width = containerRef.current.offsetWidth;
+
+      if (width > 400) setMaxChars(50);
+      else if (width > 350) setMaxChars(45);
+      else if (width > 300) setMaxChars(35);
+      else if (width > 200) setMaxChars(25);
+      else if (width > 150) setMaxChars(18);
+      else setMaxChars(10);
+    }
+
+    updateMaxChars();
+    window.addEventListener("resize", updateMaxChars);
+    return () => window.removeEventListener("resize", updateMaxChars);
+  }, []);
+
+  const displayText =
+    text.length > maxChars ? text.slice(0, maxChars - 3) + "..." : text;
+
+  return <div ref={containerRef}>{displayText}</div>;
+}
+
 interface SearchBarProps {
   size: string;
   text: string;
@@ -68,7 +96,6 @@ export default function SearchBar({ size, text }: SearchBarProps) {
     };
   }, []);
 
-  // Handle keyboard events
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "ArrowDown") {
       setSelectedIndex((prevIndex) =>
@@ -79,7 +106,9 @@ export default function SearchBar({ size, text }: SearchBarProps) {
         prevIndex > 0 ? prevIndex - 1 : prevIndex
       );
     } else if (e.key === "Enter" && selectedIndex !== -1) {
-      router.push(`/cards/${encodeURIComponent(matches[selectedIndex])}`);
+        if (selectedIndex === -1) router.push(`/cards/${encodeURIComponent(search)}`);
+        else router.push(`/cards/${encodeURIComponent(matches[selectedIndex])}`);
+      
     }
   };
 
@@ -111,7 +140,7 @@ export default function SearchBar({ size, text }: SearchBarProps) {
               }}
               onMouseEnter={() => setSelectedIndex(index)}
             >
-              {item.length > 31 ? item.slice(0, 28) + '...' : item}
+              <ResponsiveTruncatedText text={item} />
             </div>
           ))}
         </div>
