@@ -165,9 +165,9 @@ export default function Card() {
         <div className="flex items-center justify-center w-full">
           <div className="flex flex-wrap flex-row justify-center w-2/3 gap-4">
           {isSearching && <LoadingWheel/>}
-          {(!isSearching && filteredPriceData.length === 0) && 
-          <p className="mt-20 italic text-gray-400">Looks like this card is playing hard to get. It's out of stock for now!</p>}
-            {filteredPriceData.map((card: CardDetails, index) => (
+          {(!isSearching && data.length === 0) && 
+          <p className="mt-20 italic text-gray-400">Looks like this card is playing hard to get. It&apos;s out of stock for now!</p>}
+            {data.map((card: CardDetails, index) => (
               <InfoPanel key={index} card={card} />
             ))}
           </div>

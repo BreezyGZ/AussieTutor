@@ -54,6 +54,7 @@ app.get('/api/magiccards', async (req, res, next) => {
           const stock = parseInt($(elem).closest('.group-descript').find('.commerce-product-field-commerce-stock .field-item').text().trim());
           const match = name.match(/^\((.*?)\)\s*(.+)$/);
           let cardname = name;
+          
           let details = null;
           if (match) {
             cardname = match[2].trim();
