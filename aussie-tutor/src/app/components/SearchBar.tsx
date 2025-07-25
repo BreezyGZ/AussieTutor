@@ -105,7 +105,7 @@ export default function SearchBar({ size, text }: SearchBarProps) {
       setSelectedIndex((prevIndex) =>
         prevIndex > 0 ? prevIndex - 1 : prevIndex
       );
-    } else if (e.key === "Enter" && selectedIndex !== -1) {
+    } else if (e.key === "Enter") {
         if (selectedIndex === -1) router.push(`/cards/${encodeURIComponent(search)}`);
         else router.push(`/cards/${encodeURIComponent(matches[selectedIndex])}`);
       
