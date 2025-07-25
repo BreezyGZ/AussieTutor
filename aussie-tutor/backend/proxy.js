@@ -4,7 +4,7 @@ import axios from 'axios';
 import cors from 'cors';
 import scrapeRonin from './scrapeRonin.js'
 import scrapeGoodGames from './scrapeGoodGames.js'
-import getAllCards from "./getAllCards.js"
+import { getAllCards, updateCardNames } from "./getAllCards.js"
 import { removeDuplicateCards, parseCardString } from './helpers.js';
 
 const app = express();
@@ -189,13 +189,13 @@ app.get('/api/gamesportal', async (req, res, next) => {
     }
 });
 
-// app.get('/api/gamesportal', async (req, res, next) => {
-
-// })
-
 app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Internal Server Error' });
 });
+
+updateCardNames();
+setInterval(updateCardNames, 24 * 60 * 60 * 1000);
+
 // Start the server
 app.listen(PORT, () => {
   console.log(`Proxy server running on http://localhost:${PORT}`);

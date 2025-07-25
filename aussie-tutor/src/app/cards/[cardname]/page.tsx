@@ -146,10 +146,14 @@ export default function Card() {
       {isFilterOpen && <FilterBar
         setIsFilterOpen={setIsFilterOpen}
         priceData={priceData} 
-        setSets={setSelectedSets} 
-        setFinishs={setSelectedFinishs} 
-        setStores={setSelectedStores} 
-        setConditions={setSelectedConditions}
+        setSelectedSets={setSelectedSets} 
+        setSelectedFinishs={setSelectedFinishs} 
+        setSelectedStores={setSelectedStores} 
+        setSelectedConditions={setSelectedConditions}
+        selectedSets={selectedSets} 
+        selectedFinishs={selectedFinishs}
+        selectedStores={selectedStores}
+        selectedConditions={selectedConditions}
       />}
       <div className="flex flex-col items-center w-full">
         <div className="flex items-center space-x-8 pt-5 px-10 break-all">

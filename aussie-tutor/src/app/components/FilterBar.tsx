@@ -6,22 +6,33 @@ import { FaChevronDown, FaChevronUp } from 'react-icons/fa'
 interface FilterBarProps {
   setIsFilterOpen: (isFilterOpen: boolean) => void;
   priceData: CardDetails[];
-  setSets: (selected: string[]) => void;
-  setFinishs: (selected: string[]) => void;
-  setStores: (selected: string[]) => void;
-  setConditions: (selected: string[]) => void;
+
+  selectedSets: string[];
+  setSelectedSets: (selected: string[]) => void;
+
+  selectedFinishs: string[];
+  setSelectedFinishs: (selected: string[]) => void;
+
+  selectedStores: string[];
+  setSelectedStores: (selected: string[]) => void;
+
+  selectedConditions: string[];
+  setSelectedConditions: (selected: string[]) => void;
 }
 
-export default function FilterBar({setIsFilterOpen, priceData, setSets, setFinishs, setStores, setConditions}: FilterBarProps) {
+export default function FilterBar({
+    setIsFilterOpen, priceData, selectedSets, setSelectedSets, selectedFinishs, setSelectedFinishs,
+    selectedStores, setSelectedStores, selectedConditions, setSelectedConditions
+  }: FilterBarProps) {
   const sets = new Set<string>();
   const finishs = new Set<string>();
   const stores = new Set<string>();
   const conditions = new Set<string>();
 
-  const [selectedSets, setSelectedSets] = useState<string[]>([])
-  const [selectedFinishs, setSelectedFinishs] = useState<string[]>([])
-  const [selectedStores, setSelectedStores] = useState<string[]>([])
-  const [selectedConditions, setSelectedConditions] = useState<string[]>([])
+  // const [selectedSets, setSelectedSets] = useState<string[]>([])
+  // const [selectedFinishs, setSelectedFinishs] = useState<string[]>([])
+  // const [selectedStores, setSelectedStores] = useState<string[]>([])
+  // const [selectedConditions, setSelectedConditions] = useState<string[]>([])
   const [isCollapsed, setIsCollapsed] = useState<boolean[]>([false, false, false, false])
   
   const overlayRef = useRef<HTMLDivElement>(null);
@@ -38,6 +49,13 @@ export default function FilterBar({setIsFilterOpen, priceData, setSets, setFinis
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [setIsFilterOpen]);
+
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = 'auto';
+    };
+  }, []);
   
   for (const card of priceData) {
     sets.add(card.set)
@@ -52,15 +70,22 @@ export default function FilterBar({setIsFilterOpen, priceData, setSets, setFinis
     setIsCollapsed(updated)
   }
 
+  const handleClearAll = () => {
+    setSelectedSets([])
+    setSelectedFinishs([])
+    setSelectedStores([])
+    setSelectedConditions([])
+  }
+
   return (
     <div className="absolute inset-0 flex items-center justify-center z-50 bg-gray-600 bg-opacity-60" >
-      <div className="flex flex-col relative w-1/2 max-h-[80vh] overflow-y-auto p-5 bg-white space-y-2 rounded-2xl" ref={overlayRef}>
+      <div className="flex flex-col relative w-2/3 sm:w-1/2 max-h-[80vh] overflow-y-auto p-5 bg-white space-y-2 rounded-2xl" ref={overlayRef}>
         {[
-          { label: "set", data: sets, selected: selectedSets, setSelected: setSelectedSets, setData: setSets },
-          { label: "finish", data: finishs, selected: selectedFinishs, setSelected: setSelectedFinishs, setData: setFinishs },
-          { label: "store", data: stores, selected: selectedStores, setSelected: setSelectedStores, setData: setStores },
-          { label: "condition", data: conditions, selected: selectedConditions, setSelected: setSelectedConditions, setData: setConditions },
-        ].map(({ label, data, selected, setSelected, setData }, i) => (
+          { label: "set", data: sets, selected: selectedSets, setSelected: setSelectedSets },
+          { label: "finish", data: finishs, selected: selectedFinishs, setSelected: setSelectedFinishs },
+          { label: "store", data: stores, selected: selectedStores, setSelected: setSelectedStores },
+          { label: "condition", data: conditions, selected: selectedConditions, setSelected: setSelectedConditions },
+        ].map(({ label, data, selected, setSelected }, i) => (
         <div
           key={label}
           className="sm p-3 transition-all"
@@ -82,7 +107,7 @@ export default function FilterBar({setIsFilterOpen, priceData, setSets, setFinis
           {!isCollapsed[i] && (
             <div className="flex flex-wrap gap-3 mt-2 pr-1">
               {[...data].sort().map((item: string) => (
-                <label key={item} className="flex items-center gap-2 text-gray-700">
+                <label key={item} className="flex items-center gap-2 text-gray-700 cursor-pointer">
                   <input
                     type="checkbox"
                     className="accent-blue-600"
@@ -92,7 +117,6 @@ export default function FilterBar({setIsFilterOpen, priceData, setSets, setFinis
                         ? selected.filter((s) => s !== item)
                         : [...selected, item];
                       setSelected(updated);
-                      setData(updated);
                     }}
                   />
                   {item}
@@ -100,8 +124,23 @@ export default function FilterBar({setIsFilterOpen, priceData, setSets, setFinis
               ))}
             </div>
           )}
+
         </div>
         ))}
+        <div className="flex justify-between px-4 pt-2">
+          <button
+            onClick={handleClearAll}
+            className="text-sm font-semibold text-gray-600 hover:text-at-red transition"
+          >
+            Clear All
+          </button>
+          <button
+            onClick={() => setIsFilterOpen(false)}
+            className="text-sm font-semibold text-gray-600 hover:text-at-red transition"
+          >
+            Close
+          </button>
+        </div>
       </div>
     </div>
   )
