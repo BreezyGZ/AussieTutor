@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import Card from "../cards/[cardname]/page";
 import { CardDetails } from "../interfaces";
 import { FaChevronDown, FaChevronUp } from 'react-icons/fa'
 
@@ -65,7 +64,7 @@ export default function FilterBar({
   }
 
   const handleCollapse = (i: number) => {
-    let updated = [...isCollapsed]
+    const updated = [...isCollapsed]
     updated[i] = !updated[i]
     setIsCollapsed(updated)
   }

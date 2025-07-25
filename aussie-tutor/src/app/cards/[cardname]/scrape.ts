@@ -86,7 +86,7 @@ async function scrapeMtgMate(cardURI: string): Promise<CardDetails[]> {
 //   });
 // }
 
-const safeJson = async (res: Response): Promise<any[]> => {
+const safeJson = async (res: Response): Promise<CardDetails[]> => {
   if (!res.ok) return [];
   try {
     const text = await res.text();

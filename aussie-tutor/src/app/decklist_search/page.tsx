@@ -1,8 +1,8 @@
 'use client'
-
-import { useEffect, useRef, useState } from "react";
-import { useRouter } from 'next/navigation';
-import { BACKEND_URL } from '@/app/backendConfig'
+import { useState } from "react";
+// import { useEffect, useRef, useState } from "react";
+// import { useRouter } from 'next/navigation';
+// import { BACKEND_URL } from '@/app/backendConfig'
 
 export default function DecklistSearch() {
   const [input, setInput] = useState<string>("")
@@ -15,7 +15,7 @@ export default function DecklistSearch() {
     return !isNaN(Number(str)) && str.trim() !== '';
   };
   const handleSubmit = () => {
-    const output: Array<Array<string|number>> = []
+    // const output: Array<Array<string|number>> = []
     const lines: Array<string> = input.split('\n');
     console.log(lines)
 
@@ -53,6 +53,6 @@ export default function DecklistSearch() {
   )
 }
 
-function isNumeric(arg0: string) {
-  throw new Error("Function not implemented.");
-}
+// function isNumeric(arg0: string) {
+//   throw new Error("Function not implemented.");
+// }

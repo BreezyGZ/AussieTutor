@@ -1,5 +1,4 @@
 "use client";
-import Image from 'next/image';
 import './globals.css'
 import './landing.css'
 import SearchBar from './components/SearchBar';
@@ -17,10 +16,7 @@ export default function Home() {
           A one-stop site to find the best deals in Australia!
         </p>
         <SearchBar size="w-full sm:w-2/3 lg:w-1/3" text="Type any card name..."/>
-        
       </div>
-      
-  
     </div>
   );
   

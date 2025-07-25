@@ -83,7 +83,7 @@ export default async function getCardFace(card: CardDetails) {
     const face = data.data[0].image_uris.border_crop;
     return face
   }
-  catch (error) {
+  catch {
     // console.log(setCode)
     // console.log(`https://api.scryfall.com/cards/search?q=!"${card.cardname}"+set%3A${setCode}${extraSearchParams}`)
     return "/assets/damaged_mtg_back.png"
