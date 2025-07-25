@@ -105,7 +105,7 @@ h2 {
 
 @font-face {
   font-family: 'Work-Sans';
-  src: url('/fonts/Work-Sans/WorkSans-Regular.otf') format('opentype');
+  src: url('/fonts/Work-Sans/WorkSans-Regular.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
 }

@@ -42,7 +42,6 @@ function parseConditionFinish(input) {
 
 function formatGG2AT(obj, cardname) {
     const match = splitCardInfo(obj.title)
-    // console.log(obj)
     if (!match || match.cardname !== cardname) {
         return []
     }
@@ -50,7 +49,6 @@ function formatGG2AT(obj, cardname) {
     const allCards = []
 
     for (const variant of obj.variants) {
-        // console.log(variant)
         if (variant.inventory_quantity === 0) {
             continue;
         }
@@ -78,7 +76,11 @@ export default async function scrapeGoodGames(cardURI) {
     try {
         const { data } = await axios.get(`${URL}/search?q=${cardURI}&f_Availability=Exclude Out Of Stock`, {
             headers: {
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
+                "Accept-Language": "en-US,en;q=0.9",
+                "Accept": "text/html,application/xhtml+xml",
+                "Referer": `${URL}`,    
+                "Connection": "keep-alive",
             }
         });
         
@@ -89,22 +91,16 @@ export default async function scrapeGoodGames(cardURI) {
 
 
         let cards = []
-        // console.log(cards)
         for (const match of jsonDataStrings) {
             const pairs = match.split(" = ")
-            // console.log(toJsonString(pairs[1]))
             const cleanData = parseRawJsonString(pairs[1])
-            // console.log(cleanData)
             const variants = formatGG2AT(cleanData, cardname)
-            cards = [...cards, ...variants]
-
-            
+            cards = [...cards, ...variants]   
         }
         return(cards)
 
-
     } catch (error) {
-        console.log(error)
+        console.error("goodgames" + error)
     }
 }
 

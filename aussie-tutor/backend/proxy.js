@@ -4,21 +4,21 @@ import axios from 'axios';
 import cors from 'cors';
 import scrapeRonin from './scrapeRonin.js'
 import scrapeGoodGames from './scrapeGoodGames.js'
+import { getAllCards, updateCardNames } from "./getAllCards.js"
 import { removeDuplicateCards, parseCardString } from './helpers.js';
-import fs from "fs"
 
 const app = express();
 const PORT = 5000;
 const MAGICHOTHUB_URL = "https://magiccards.com.au"
 const GAMESPORTAL_URL = "https://gamesportal.com.au";
-// Enable CORS for local development
+
 app.use(cors());
 
 app.get('/api/allcards', async (req, res, next) => {
   try {
-    const fileContent = await fs.promises.readFile('../public/allCards.txt', 'utf8');
-    const cardNames = JSON.parse(fileContent);
-    res.status(200).json(cardNames); // Respond with card names
+    const cardNames = await getAllCards()
+    // console.log(cardNames)
+    res.status(200).json(cardNames);
   } catch (error) {
     console.error('Error reading file:', error);
     res.status(500).json({ message: 'Error reading the file' });
@@ -32,8 +32,6 @@ app.get('/api/magiccards', async (req, res, next) => {
       return;
     }
     const baseUrl = `${MAGICHOTHUB_URL}/search/product?search_api_views_fulltext=${encodeURIComponent(card)}`;
-    // console.log(`Received request for card: ${card}`);
-    // console.log(`Fetching URL: ${targetUrl}`);
 
     let targetUrl = null
     let index = 0
@@ -44,8 +42,8 @@ app.get('/api/magiccards', async (req, res, next) => {
       } else {
         targetUrl = `${baseUrl}&page=${index.toString()}`;
       }
+
       try {
-        // console.log(`Fetching URL: ${targetUrl}`);
         const { data } = await axios.get(targetUrl);
         const $ = cheerio.load(data);
         const cards = [];
@@ -53,7 +51,6 @@ app.get('/api/magiccards', async (req, res, next) => {
         $('.commerce-product-field-commerce-price').each((i, elem) => {
           const name = $(elem).closest('.group-descript').find('h2 a').text().trim();
           const link = $(elem).closest('.group-descript').find('h2 a').attr('href');
-          // console.log(link)
           const stock = parseInt($(elem).closest('.group-descript').find('.commerce-product-field-commerce-stock .field-item').text().trim());
           const match = name.match(/^\((.*?)\)\s*(.+)$/);
           let cardname = name;
@@ -65,7 +62,7 @@ app.get('/api/magiccards', async (req, res, next) => {
           }
 
           const price = $(elem).find('.price-amount').text().trim().slice(1);
-          const finish = $(elem).closest('.group-descript').find('.commerce-product-field-field-foil .field-item').text().trim();
+          let finish = $(elem).closest('.group-descript').find('.commerce-product-field-field-foil .field-item').text().trim();
           const set = $(elem).closest('.group-descript').find('.commerce-product-field-field-set li').text().trim();
           const condition = $(elem).closest('.group-descript').find('.commerce-product-field-field-condition li').text().trim();
 
@@ -74,6 +71,9 @@ app.get('/api/magiccards', async (req, res, next) => {
           // }
           if (cardname.toLowerCase() !== card.toLowerCase()) {
             return;
+          }
+          if (finish === "Non Foil") {
+            finish = "Nonfoil"
           }
           cards.push({
             store: "Magic Hothub",
@@ -92,13 +92,11 @@ app.get('/api/magiccards', async (req, res, next) => {
         if (cards.length === 0) {
           break;
         }
-
         allCards.push(...cards);
         index++;
       
     } catch (error) {
-      console.error(error);
-      break;
+      console.error("hothub" + error);
     }
   }
   allCards = removeDuplicateCards(allCards);
@@ -114,7 +112,6 @@ app.get('/api/ronin', async (req, res, next) => {
   const data = await scrapeRonin(card)
   res.json(data)
 });
-
 
 app.get('/api/goodgames', async (req, res, next) => {
 
@@ -133,8 +130,6 @@ app.get('/api/gamesportal', async (req, res, next) => {
       res.status(400).json({ error: 'Missing "card" query parameter' });
       return;
     }
-  
-    // const regex = /^(.+?)\s*(?:\((.*?)\))?\s*\[(.+?)\]$/;
 
     try {
       let links = new Map();
@@ -148,32 +143,23 @@ app.get('/api/gamesportal', async (req, res, next) => {
         const cardname = match[1]
   
         if (cardname.trim() !== decodeURI(card)) {
-          // console.log(`Not a match ${title}`)
           return;
         }
         const info = {
           image: $(element).find(".grid-view-item__image").attr("src"),
           link: $(element).find('a').attr('href')
         }
-            
         links.set(title, info)
-        // console.log(title)
-      })
-      // console.log(links)
-  
+      })  
       let allCards = []
       const matchedDivs = $('div[id^="productCardList2-js-"]');
       matchedDivs.each((i, element) => {
         let json = JSON.parse($(element).attr('data-product-variants').replace(/&quot;/g, '"'));
         json.forEach((rawCard, index) => {
-          // console.log(rawCard.name)
           const match = rawCard.name.match(/^([^\[\(\]]+)/);
           const cardname = match[1]
   
           if (cardname.trim() !== decodeURI(card)) {
-            // console.log(`Not a match ${rawCard.name}`)
-            // console.log(cardname.trim())
-            // console.log(card.trim())
             return;
           }
           if (!rawCard.available) {
@@ -181,8 +167,6 @@ app.get('/api/gamesportal', async (req, res, next) => {
           }
           const title = parseCardString(rawCard.name)
           const raw = rawCard.name.split(" - ")[0]
-          // console.log(raw)
-          // console.log(links.get(raw))
           const clean = {
             cardname: title[0],
             condition: title[3],
@@ -196,23 +180,22 @@ app.get('/api/gamesportal', async (req, res, next) => {
             link: GAMESPORTAL_URL + links.get(raw).link,
           }
           allCards.push(clean)
-  
-          
         });
-        // console.log(json);
       });
-      // console.log(data)
       res.json(allCards);
-      
     }
     catch (error) {
-      console.error(error)
+      console.error("gamesportal" + error)
     }
 });
 
 app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Internal Server Error' });
 });
+
+updateCardNames();
+setInterval(updateCardNames, 24 * 60 * 60 * 1000);
+
 // Start the server
 app.listen(PORT, () => {
   console.log(`Proxy server running on http://localhost:${PORT}`);
