@@ -65,6 +65,10 @@ app.get("/api/gamesportal", async (req, res) => {
 app.use((err, req, res) => {
   res.status(500).json({ error: "Internal Server Error" });
 });
+
+updateCardNames();
+setInterval(updateCardNames, 24 * 60 * 60 * 1000);
+
 // Start the server
 app.listen(PORT, () => {
   console.log(`Proxy server running on http://localhost:${PORT}`);

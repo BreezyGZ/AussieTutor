@@ -2,23 +2,19 @@
 
 import scrape from "./scrape"
 import getCardFace from "./getCardFace";
-// import { useParams, useRouter } from 'next/navigation'
 import { useParams } from 'next/navigation'
 import { JSX, useEffect, useState } from "react";
 import {InfoPanelProps, CardDetails} from '@/app/interfaces.js'
 import Image from "next/image";
 import axios from "axios";
-// import magicHothubLogo from '@/assets/magichothub-logo.jpg'
-// import mtgmateLogo from '@/assets/mtgmate-logo.png'
-// import pacifism from '@/assets/fdn-501-pacifism.jpg'
 import '@/app/globals.css';
-// import "@saeris/typeface-beleren-bold"
 import ManaCost from "@/app/components/ManaCost";
+import LoadingWheel from "@/app/components/LoadingWheel";
+import FilterBar from "@/app/components/FilterBar";
+import { HiAdjustmentsHorizontal } from "react-icons/hi2";
 
 function InfoPanel({ card }: InfoPanelProps): JSX.Element {
   const [face, setFace] = useState<string>("")
-  
-  // const [logo, setLogo] = useState<any>(null)
   
   const priceString = '$' + card.price.toFixed(2).toString();
   const description = card.details ? `${card.set} (${card.details})` : card.set
@@ -36,13 +32,6 @@ function InfoPanel({ card }: InfoPanelProps): JSX.Element {
         console.error("Error fetching card face:", error);
       }
     };
-    // console.log(card.store)
-    // if (card.store === "MTGMate") {
-    //   setLogo(mtgmateLogo)
-    // } 
-    // else if (card.store === "Magic Hothub") {
-    //   setLogo(magicHothubLogo)
-    // }
     fetchCardFace();
   }, [card]);
 
@@ -57,10 +46,12 @@ function InfoPanel({ card }: InfoPanelProps): JSX.Element {
         <p>{priceString}</p>
       </div>
       <div className="flex flex-col gap-1 w-1/2">
-        {/* {logo && <Image src={logo} alt={card.store} width={130} height={50}/>} */}
         {card.store === "Magic Hothub" && <Image src="/assets/magichothub-logo.jpg" alt="Magic HotHub" width={130} height={50}/>}
         {card.store === "MTGMate" && <Image src="/assets/mtgmate-logo.png" alt="MtgMate" width={130} height={50}/>}
+        {card.store === "Ronin Games" && <Image src="/assets/ronin-logo.png" alt="RoninGames" width={70} height={50}/>}
+        {card.store === "Good Games" && <Image src="/assets/goodgames-logo.png" alt="GoodGames" width={130} height={50}/>}
         {card.store === "Games Portal" && <Image src="/assets/gamesportal-logo.png" alt="Games Portal" width={130} height={50}/>}
+
         <p className="font-beleren text- break-words">{description}</p>  
         <p>Condition: {card.condition}</p>
         <p>Finish: {card.finish}</p>
@@ -72,19 +63,55 @@ function InfoPanel({ card }: InfoPanelProps): JSX.Element {
 
 export default function Card() {
   const { cardname } = useParams<{ cardname: string | undefined }>();
-  const [data, setData] = useState<CardDetails[]>([]);
-  const [flavor, setFlavor] = useState<string>("")
-  const [manaCost, setManaCost] = useState<string>("{}")
-
+  const [flavor, setFlavor] = useState<string>("");
+  const [manaCost, setManaCost] = useState<string>("{}");
+  const [isSearching, setIsSearching] = useState<boolean>(true);
   const decodedCardname = cardname ? decodeURIComponent(cardname) : undefined;
-  // const router = useRouter();
 
+  const [priceData, setPriceData] = useState<CardDetails[]>([]);
+  const [filteredPriceData, setFilteredPriceData] = useState<CardDetails[]>([]);
+  
+  const [selectedSets, setSelectedSets] = useState<string[]>([])
+  const [selectedFinishs, setSelectedFinishs] = useState<string[]>([])
+  const [selectedStores, setSelectedStores] = useState<string[]>([])
+  const [selectedConditions, setSelectedConditions] = useState<string[]>([])
+
+  const [isFilterOpen, setIsFilterOpen] = useState<boolean>(false)
+  const [isPriceAsc, setIsPriceAsc] = useState<boolean>(true)
+
+  // const handleSetChange = (selected: string[]) => {
+  //   setSelectedSets(selected)
+  // }
+
+  useEffect(() => {
+    let updated = [...priceData]
+    if (selectedSets.length > 0) {
+      updated = updated.filter((details) => selectedSets.includes(details.set))
+    }
+    if (selectedFinishs.length > 0) {
+      updated = updated.filter((details) => selectedFinishs.includes(details.finish))
+    }
+    if (selectedStores.length > 0) {
+      updated = updated.filter((details) => selectedStores.includes(details.store))
+    }
+    if (selectedConditions.length > 0) {
+      updated = updated.filter((details) => selectedConditions.includes(details.condition))
+    }
+
+    if (!isPriceAsc) {
+      updated.reverse();
+    }
+    setFilteredPriceData(updated)
+
+  }, [selectedSets, selectedFinishs, selectedStores, selectedConditions, priceData, isPriceAsc])
+  
   useEffect(() => {
     const fetchData = async () => {
       if (typeof decodedCardname === 'string') {
         const result = await scrape(decodedCardname);
-        setData(result);
-        // console.log(result)
+        setPriceData(result);
+        setFilteredPriceData(result);
+        setIsSearching(false);
       } else {
         console.error("cardname is not a string");
       }
@@ -93,24 +120,21 @@ export default function Card() {
     const decorate = async() => {
       try {
         const {data} = await axios.get(`https://api.scryfall.com/cards/search?q=!"${decodedCardname}"&unique=prints`)
-        console.log(data)
-
         if (!data.data) {
-          return
+          return;
         }
         if (data.data[0].mana_cost) {
           setManaCost(data.data[0].mana_cost)
         }
         
         for (const card of data.data) {
-          // console.log(card)
           if (card.flavor_text) {
             setFlavor(`${card.flavor_text}`);
             break;
           }
         }
       } catch (error) {
-        console.log(error)
+        console.log("flavor scryfall fail" + error)
       }
     }
     fetchData();
@@ -118,18 +142,49 @@ export default function Card() {
   }, [cardname]);
 
   return (
-    <div className="flex justify-center">
+    <div className="flex justify-center pt-16 xl:pt-0">
+      {isFilterOpen && <FilterBar
+        setIsFilterOpen={setIsFilterOpen}
+        priceData={priceData} 
+        setSelectedSets={setSelectedSets} 
+        setSelectedFinishs={setSelectedFinishs} 
+        setSelectedStores={setSelectedStores} 
+        setSelectedConditions={setSelectedConditions}
+        selectedSets={selectedSets} 
+        selectedFinishs={selectedFinishs}
+        selectedStores={selectedStores}
+        selectedConditions={selectedConditions}
+      />}
       <div className="flex flex-col items-center w-full">
-        <div className="flex items-center space-x-8 pt-5 px-10">
+        <div className="flex items-center space-x-8 pt-5 px-10 break-all">
           <h1 className="font-beleren">{decodedCardname && decodeURIComponent(decodedCardname)}</h1>
           <ManaCost manaCost={manaCost}/>
         </div>
         
         {flavor && <p className="w-2/3 text-center italic py-3">{flavor}</p>}
+        <div className="flex justify-between mb-3 px-10 w-full sm:w-2/3 lg:w-1/2">
+          <button
+            className="flex items-center justify-center gap-2 px-4 py-2 bg-white text-gray-800 hover:bg-gray-200 rounded-2xl shadow-md transition duration-200"
+            onClick={() => {setIsPriceAsc(!isPriceAsc)}}
+          >
+            Price: {isPriceAsc ? " Low-High": " High-Low"}
+          </button>
+          <button
+            className="flex items-center justify-center gap-2 px-4 py-2 bg-white text-gray-800 hover:bg-gray-200 rounded-2xl shadow-md transition duration-200"
+            onClick={() => setIsFilterOpen(!isFilterOpen)}
+          >
+            <span>Filters</span>
+            <HiAdjustmentsHorizontal className="w-5 h-5" />
+          </button>
+        </div>
+        
+        
         <div className="flex items-center justify-center w-full">
-
           <div className="flex flex-wrap flex-row justify-center w-2/3 gap-4">
-            {data.map((card: CardDetails, index) => (
+          {isSearching && <LoadingWheel/>}
+          {(!isSearching && filteredPriceData.length === 0) && 
+          <p className="mt-20 italic text-gray-400">Looks like this card is playing hard to get. It&apos;s out of stock for now!</p>}
+            {filteredPriceData.map((card: CardDetails, index) => (
               <InfoPanel key={index} card={card} />
             ))}
           </div>

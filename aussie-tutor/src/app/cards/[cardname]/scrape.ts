@@ -1,10 +1,9 @@
 import { CardDetails } from "../../interfaces.js";
 import axios from 'axios';
 import * as cheerio from 'cheerio';
-
+import { BACKEND_URL } from '@/app/backendConfig'
 // URL to scrape
 const MTGMATE_URL = 'https://www.mtgmate.com.au';
-const BACKEND_URL = 'http://localhost:5000'
 // const MAGICCARDS_URL = 'https://magiccards.com.au/search/product?search_api_views_fulltext='
 
 async function scrapeMtgMate(cardURI: string): Promise<CardDetails[]> {
@@ -56,12 +55,12 @@ async function scrapeMtgMate(cardURI: string): Promise<CardDetails[]> {
         link
       });
     }
-    console.log("MTGMate")
-    console.log(cleanData)
+    // console.log("MTGMate")
+    // console.log(cleanData)
     return cleanData;
   } 
   catch (error) {
-    console.error(error);
+    console.error("scrapeMtgMate" + error);
     return [];
   }
 }
@@ -87,20 +86,39 @@ async function scrapeMtgMate(cardURI: string): Promise<CardDetails[]> {
 //   });
 // }
 
-export default async function scrape(card: string): Promise<CardDetails[]> {
+const safeJson = async (res: Response): Promise<CardDetails[]> => {
+  if (!res.ok) return [];
   try {
-    const [hothub_res, gamesportal_res, mate] = await Promise.all([
+    const text = await res.text();
+    if (!text) return [];
+    return JSON.parse(text);
+  } catch (e) {
+    console.error("Failed to parse JSON:", e);
+    return [];
+  }
+};
+
+export default async function scrape(card: string): Promise<CardDetails[]> {
+  console.log(card)
+  try {
+    const [hothub_res, gamesportal_res, goodgames_res, ronin_res, mate_res] = await Promise.allSettled([
       fetch(`${BACKEND_URL}/api/magiccards?card=${encodeURIComponent(card)}`),
       fetch(`${BACKEND_URL}/api/gamesportal?card=${encodeURIComponent(card)}`),
+      fetch(`${BACKEND_URL}/api/goodgames?card=${encodeURIComponent(card)}`),
+      fetch(`${BACKEND_URL}/api/ronin?card=${encodeURIComponent(card)}`),
       scrapeMtgMate(card),
     ]);
+    const hothub = hothub_res.status === "fulfilled" ? await safeJson(hothub_res.value) : [];
+    const gamesportal = gamesportal_res.status === "fulfilled" ? await safeJson(gamesportal_res.value) : [];
+    const goodgames = goodgames_res.status === "fulfilled" ? await safeJson(goodgames_res.value) : [];
+    const ronin = ronin_res.status === "fulfilled" ? await safeJson(ronin_res.value) : [];
+    const mate = mate_res.status === "fulfilled" ? mate_res.value : [];
 
-    const hothub = hothub_res.ok ? await hothub_res.json() : [];
-    const gamesportal = gamesportal_res.ok ? await gamesportal_res.json() : [];
-
-    const allCards = [...hothub, ...gamesportal, ...mate];
+    const allCards = [...hothub, ...gamesportal, ...mate, ...goodgames, ...ronin];
+    console.log(allCards)
     return allCards.sort((a, b) => a.price - b.price);
-  } catch (error) {
+  } 
+  catch (error) {
     console.error("Error scraping card data:", error);
     return [];
   }

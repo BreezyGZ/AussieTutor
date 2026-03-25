@@ -1,74 +1,23 @@
 "use client";
-import axios from 'axios';
-import { useEffect, useState } from "react";
-import { useRouter } from 'next/navigation';
 import './globals.css'
 import './landing.css'
-
-async function getPartialMatches(partial: string) {
-  const {data} = await axios.get("https://api.scryfall.com/catalog/card-names")
-  const allCards = data.data.filter((s: string) => !s.startsWith('A-'));
-  const filteredCards = allCards.filter((card: string) =>
-    card.toLowerCase().includes(partial.toLowerCase())
-  );
-
-  // Sort the matches to prioritize exact matches or closer matches
-  const sortedCards = filteredCards.sort((a: string, b: string) => {
-    const aIndex = a.toLowerCase().indexOf(partial.toLowerCase());
-    const bIndex = b.toLowerCase().indexOf(partial.toLowerCase());
-
-    if (a.toLowerCase() === partial.toLowerCase()) return -1;
-    if (b.toLowerCase() === partial.toLowerCase()) return 1;
-
-    if (aIndex !== bIndex) return aIndex - bIndex;
-
-    return a.localeCompare(b);
-  });
-  return sortedCards;
-}
+import SearchBar from './components/SearchBar';
 
 export default function Home() {
-  const [search, setSearch] = useState<string>("")
-  const [matches, setMatches] = useState<string[]>([])
-  const router = useRouter();
-
-  useEffect(() => {
-    const fetchMatches = async () => {
-      try {
-        const newMatches = await getPartialMatches(search); // Call your async function
-        setMatches(newMatches); // Update state with results
-      } catch (error) {
-        console.error("Error fetching matches:", error);
-      }
-    };
-  
-    if (search === "") {
-      setMatches([]);
-    } else {
-      fetchMatches();
-    }
-  }, [search]);
-
+  // flex flex-col items-center justify-between 
   return (
-    <div className="main">
-      <div className="main-wrapper">
-        <h1>AussieTutor</h1>
-        <div className="search-bar">
-          <input
-            type="text"
-            placeholder="Find"
-            onChange={(e)=>setSearch(e.target.value)}
-          >
-          </input>
-          <div className="matchlist">
-            {matches.slice(0, 10).map((item, index) => (
-              <div key={index} className="match" onClick={() => {router.push(`/cards/${item}`)}}>
-                {item.length > 31 ? item.slice(0, 28) + '...' : item }
-              </div>
-            ))}
-          </div>  
-        </div>
+    <div 
+      className="gap-20 pb-20 min-h-screen bg-landing bg-cover bg-center "
+    >
+      <div className="absolute inset-0 bg-at-red bg-opacity-60 z-0" />
+      <div className="flex flex-col gap-4 items-center p-10 pt-40">
+        <h1 className='font-inlander tracking-[0.25em] text-4xl md:text-5xl lg:text-6xl text-white z-10'>aussietutor</h1>
+        <p className="text-center z-10 text-xl text-white pb-5">
+          A one-stop site to find the best deals in Australia!
+        </p>
+        <SearchBar size="w-full sm:w-2/3 lg:w-1/3" text="Type any card name..."/>
       </div>
     </div>
-  )
+  );
+  
 }
