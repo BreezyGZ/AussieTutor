@@ -1,196 +1,69 @@
-import express from 'express';
-import * as cheerio from 'cheerio';
-import axios from 'axios';
-import cors from 'cors';
-import scrapeRonin from './scrapeRonin.js'
-import scrapeGoodGames from './scrapeGoodGames.js'
-import { getAllCards, updateCardNames } from "./getAllCards.js"
-import { removeDuplicateCards, parseCardString } from './helpers.js';
+import express from "express";
+import cors from "cors";
+import scrapeRonin from "./scrapeRonin.js";
+import scrapeGoodGames from "./scrapeGoodGames.js";
+import scrapeGamesPortal from "./scrapeGamesPortal.js";
+import scrapeHotHub from "./scrapeHotHub.js";
+import { getAllCards } from "./getAllCards.js";
 
 const app = express();
 const PORT = 5000;
-const MAGICHOTHUB_URL = "https://magiccards.com.au"
-const GAMESPORTAL_URL = "https://gamesportal.com.au";
 
 app.use(cors());
 
-app.get('/api/allcards', async (req, res, next) => {
+app.get("/api/allcards", async (req, res) => {
   try {
-    const cardNames = await getAllCards()
+    const cardNames = await getAllCards();
     // console.log(cardNames)
     res.status(200).json(cardNames);
   } catch (error) {
-    console.error('Error reading file:', error);
-    res.status(500).json({ message: 'Error reading the file' });
+    console.error("Error reading file:", error);
+    res.status(500).json({ message: "Error reading the file" });
   }
-})
+});
 // Magic Hothub
-app.get('/api/magiccards', async (req, res, next) => { 
-    const card = req.query.card;
-    if (!card) {
-      res.status(400).json({ error: 'Missing "card" query parameter' });
-      return;
-    }
-    const baseUrl = `${MAGICHOTHUB_URL}/search/product?search_api_views_fulltext=${encodeURIComponent(card)}`;
-
-    let targetUrl = null
-    let index = 0
-    let allCards = []
-    while (true) {
-      if (index === 0) {
-        targetUrl = baseUrl;
-      } else {
-        targetUrl = `${baseUrl}&page=${index.toString()}`;
-      }
-
-      try {
-        const { data } = await axios.get(targetUrl);
-        const $ = cheerio.load(data);
-        const cards = [];
-
-        $('.commerce-product-field-commerce-price').each((i, elem) => {
-          const name = $(elem).closest('.group-descript').find('h2 a').text().trim();
-          const link = $(elem).closest('.group-descript').find('h2 a').attr('href');
-          const stock = parseInt($(elem).closest('.group-descript').find('.commerce-product-field-commerce-stock .field-item').text().trim());
-          const match = name.match(/^\((.*?)\)\s*(.+)$/);
-          let cardname = name;
-          
-          let details = null;
-          if (match) {
-            cardname = match[2].trim();
-            details = match[1].trim();
-          }
-
-          const price = $(elem).find('.price-amount').text().trim().slice(1);
-          let finish = $(elem).closest('.group-descript').find('.commerce-product-field-field-foil .field-item').text().trim();
-          const set = $(elem).closest('.group-descript').find('.commerce-product-field-field-set li').text().trim();
-          const condition = $(elem).closest('.group-descript').find('.commerce-product-field-field-condition li').text().trim();
-
-          // if (stock === 0) {
-          //   return;
-          // }
-          if (cardname.toLowerCase() !== card.toLowerCase()) {
-            return;
-          }
-          if (finish === "Non Foil") {
-            finish = "Nonfoil"
-          }
-          cards.push({
-            store: "Magic Hothub",
-            cardname,
-            details,
-            set,
-            price: parseFloat(price),
-            condition,
-            stock,
-            finish,
-            image: null,
-            link: `${MAGICHOTHUB_URL}${link}`,
-          });
-        });
-
-        if (cards.length === 0) {
-          break;
-        }
-        allCards.push(...cards);
-        index++;
-      
-    } catch (error) {
-      console.error("hothub" + error);
-    }
-  }
-  allCards = removeDuplicateCards(allCards);
-  res.json(allCards);
-});
-
-app.get('/api/ronin', async (req, res, next) => {
+app.get("/api/magiccards", async (req, res) => {
   const card = req.query.card;
   if (!card) {
     res.status(400).json({ error: 'Missing "card" query parameter' });
     return;
   }
-  const data = await scrapeRonin(card)
-  res.json(data)
+  const data = await scrapeHotHub(card);
+  res.json(data);
 });
 
-app.get('/api/goodgames', async (req, res, next) => {
-
+app.get("/api/ronin", async (req, res) => {
   const card = req.query.card;
   if (!card) {
     res.status(400).json({ error: 'Missing "card" query parameter' });
     return;
   }
-  const data = await scrapeGoodGames(card) 
-  res.json(data)
+  const data = await scrapeRonin(card);
+  res.json(data);
 });
 
-app.get('/api/gamesportal', async (req, res, next) => {
+app.get("/api/goodgames", async (req, res) => {
   const card = req.query.card;
-    if (!card) {
-      res.status(400).json({ error: 'Missing "card" query parameter' });
-      return;
-    }
-
-    try {
-      let links = new Map();
-      const { data } = await axios.get(`${GAMESPORTAL_URL}/search?type=product&options%5Bprefix%5D=last&q=${card}`);
-      // const { data } = await axios.get("https://gamesportal.com.au/search?options%5Bprefix%5D=last&page=2&q=faithless+looting&type=product");
-      const $ = cheerio.load(data);
-  
-      $(".grid-view-item:not(.product-price--sold-out)").each((index, element) => {
-        const title = $(element).find(".grid-view-item__title").text().trim().split(" - ")[0]
-        const match = title.match(/^([^\[\(\]]+)/);
-        const cardname = match[1]
-  
-        if (cardname.trim() !== decodeURI(card)) {
-          return;
-        }
-        const info = {
-          image: $(element).find(".grid-view-item__image").attr("src"),
-          link: $(element).find('a').attr('href')
-        }
-        links.set(title, info)
-      })  
-      let allCards = []
-      const matchedDivs = $('div[id^="productCardList2-js-"]');
-      matchedDivs.each((i, element) => {
-        let json = JSON.parse($(element).attr('data-product-variants').replace(/&quot;/g, '"'));
-        json.forEach((rawCard, index) => {
-          const match = rawCard.name.match(/^([^\[\(\]]+)/);
-          const cardname = match[1]
-  
-          if (cardname.trim() !== decodeURI(card)) {
-            return;
-          }
-          if (!rawCard.available) {
-            return;
-          }
-          const title = parseCardString(rawCard.name)
-          const raw = rawCard.name.split(" - ")[0]
-          const clean = {
-            cardname: title[0],
-            condition: title[3],
-            details: title[1],
-            finish: title[4],
-            price: rawCard.price / 100,
-            set: title[2],
-            stock: "Available",
-            store: "Games Portal",
-            image: links.get(raw).image,
-            link: GAMESPORTAL_URL + links.get(raw).link,
-          }
-          allCards.push(clean)
-        });
-      });
-      res.json(allCards);
-    }
-    catch (error) {
-      console.error("gamesportal" + error)
-    }
+  if (!card) {
+    res.status(400).json({ error: 'Missing "card" query parameter' });
+    return;
+  }
+  const data = await scrapeGoodGames(card);
+  res.json(data);
 });
 
-app.use((err, req, res, next) => {
-  res.status(500).json({ error: 'Internal Server Error' });
+app.get("/api/gamesportal", async (req, res) => {
+  const card = req.query.card;
+  if (!card) {
+    res.status(400).json({ error: 'Missing "card" query parameter' });
+    return;
+  }
+  const data = await scrapeGamesPortal(card);
+  res.json(data);
+});
+
+app.use((err, req, res) => {
+  res.status(500).json({ error: "Internal Server Error" });
 });
 
 updateCardNames();
