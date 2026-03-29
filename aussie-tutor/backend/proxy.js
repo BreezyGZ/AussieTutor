@@ -4,7 +4,7 @@ import scrapeRonin from "./scrapeRonin.js";
 import scrapeGoodGames from "./scrapeGoodGames.js";
 import scrapeGamesPortal from "./scrapeGamesPortal.js";
 import scrapeHotHub from "./scrapeHotHub.js";
-import { getAllCards } from "./getAllCards.js";
+import { getAllCards, updateCardNames  } from "./getAllCards.js";
 
 const app = express();
 const PORT = 5000;
